@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Table — My Dining Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #181410;
+    --paper: #F7F2EB;
+    --warm: #EDE5D8;
+    --accent: #B85C38;
+    --muted: #9B8F85;
+    --gold: #C8963E;
+    --green: #4A6741;
+    --border: rgba(24,20,16,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Jost', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--paper);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; }
+  .logo sup { font-size: 0.55rem; font-family: 'Jost', sans-serif; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); vertical-align: super; margin-left: 2px; }
+  .add-btn { background: var(--ink); color: var(--paper); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .add-btn:hover { background: var(--accent); }
+  .back-btn { background: none; border: none; font-family: 'Jost', sans-serif; font-size: 0.85rem; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 0.4rem; }
+  .back-btn:hover { color: var(--ink); }
+
+  .journal-header { padding: 2rem 1.5rem 1rem; }
+  .journal-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 400; font-style: italic; margin-bottom: 0.25rem; }
+  .journal-header p { font-size: 0.82rem; color: var(--muted); }
+
+  .filter-row { display: flex; gap: 0.4rem; padding: 0 1.5rem 1.25rem; overflow-x: auto; scrollbar-width: none; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .chip { padding: 0.3rem 0.85rem; border-radius: 2rem; border: 1px solid var(--border); font-size: 0.75rem; white-space: nowrap; cursor: pointer; background: transparent; font-family: 'Jost', sans-serif; color: var(--ink); transition: all 0.15s; }
+  .chip.active, .chip:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .entries { padding: 0 1.5rem 6rem; }
+  .month-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin: 1.5rem 0 0.75rem; }
+
+  /* Loading & empty states */
+  .loading-state, .empty-state, .error-state {
+    text-align: center; padding: 4rem 2rem; color: var(--muted);
+  }
+  .loading-spinner {
+    width: 32px; height: 32px; border: 2px solid var(--warm); border-top-color: var(--ink);
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty-state .emoji { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .empty-state p { font-size: 0.85rem; line-height: 1.6; }
+  .error-state { color: var(--accent); }
+
+  .entry-card { background: white; border-radius: 0.875rem; padding: 1.1rem 1.2rem; margin-bottom: 0.75rem; border: 1px solid var(--border); cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 1rem; animation: fadeIn 0.3s ease both; }
+  .entry-card:hover { border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); transform: translate(-1px,-1px); }
+  .entry-emoji { width: 48px; height: 48px; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+  .entry-info { flex: 1; min-width: 0; }
+  .entry-name { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .entry-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.35rem; }
+  .entry-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  .tag-pill { font-size: 0.65rem; padding: 0.15rem 0.55rem; border-radius: 2rem; font-weight: 500; }
+  .tag-italian { background:#FDE8D8;color:#B85C38; }
+  .tag-japanese { background:#D8EBF5;color:#2A6080; }
+  .tag-mexican { background:#FDF3D8;color:#9B7020; }
+  .tag-french { background:#E8D8F5;color:#6040A0; }
+  .tag-casual { background:#E2EDD8;color:#4A6741; }
+  .tag-finedining { background:#D8E0F5;color:#2A3E80; }
+  .tag-brunch { background:#F5D8E8;color:#A02060; }
+  .tag-thai { background:#D8F5E8;color:#206040; }
+  .tag-other { background:#EEE;color:#555; }
+  .entry-score { flex-shrink: 0; text-align: center; }
+  .score-num { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600; line-height: 1; }
+  .score-denom { font-size: 0.65rem; color: var(--muted); }
+  .score-bar { width: 36px; height: 3px; background: var(--warm); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+
+  /* DETAIL */
+  .detail-hero { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 5rem; }
+  .detail-body { padding: 1.5rem; }
+  .detail-name { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; margin-bottom: 0.2rem; line-height: 1.2; }
+  .detail-sub { font-size: 0.82rem; color: var(--muted); display: flex; gap: 1rem; margin-bottom: 1rem; }
+  .detail-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .section-title { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: var(--muted); margin-bottom: 0.75rem; }
+  .overall-score-block { display: flex; align-items: center; gap: 1.5rem; background: var(--ink); color: var(--paper); padding: 1.25rem 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem; }
+  .big-score { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 600; line-height: 1; }
+  .big-score span { font-size: 1rem; opacity: 0.5; }
+  .score-label { font-size: 0.8rem; opacity: 0.6; margin-top: 0.2rem; }
+  .score-breakdown-label { font-size: 0.85rem; opacity: 0.7; }
+  .aspects { margin-bottom: 1.5rem; }
+  .aspect-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+  .aspect-row:last-child { border-bottom: none; }
+  .aspect-name { font-size: 0.85rem; width: 110px; flex-shrink: 0; color: var(--muted); }
+  .aspect-track { flex: 1; height: 6px; background: var(--warm); border-radius: 3px; overflow: hidden; }
+  .aspect-fill { height: 100%; border-radius: 3px; }
+  .fill-high { background: var(--green); }
+  .fill-mid { background: var(--gold); }
+  .fill-low { background: var(--accent); }
+  .aspect-val { font-size: 0.85rem; font-weight: 500; width: 28px; text-align: right; flex-shrink: 0; }
+  .companions-block { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .companion-pill { display: flex; align-items: center; gap: 0.4rem; background: var(--warm); border-radius: 2rem; padding: 0.3rem 0.75rem; font-size: 0.8rem; }
+  .companion-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--muted); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.6rem; font-weight: 600; }
+  .notes-block { background: var(--warm); border-radius: 0.75rem; padding: 1rem 1.1rem; font-size: 0.88rem; line-height: 1.75; color: #444; margin-bottom: 1.5rem; font-style: italic; border-left: 3px solid var(--gold); }
+  .share-row { display: flex; gap: 0.75rem; padding-bottom: 4rem; }
+  .share-btn { flex: 1; padding: 0.85rem; border-radius: 0.75rem; border: 1.5px dashed var(--border); background: transparent; font-family: 'Jost', sans-serif; font-size: 0.82rem; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem; transition: all 0.2s; position: relative; }
+  .share-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .coming-badge { position: absolute; top: -8px; right: -4px; background: var(--gold); color: white; font-size: 0.55rem; padding: 0.1rem 0.4rem; border-radius: 2rem; letter-spacing: 0.5px; font-weight: 500; }
+
+  /* FORM */
+  .form-body { padding: 1.5rem 1.5rem 5rem; }
+  .form-body h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-style: italic; margin-bottom: 1.5rem; }
+  .field { margin-bottom: 1.1rem; }
+  .field label { display: block; font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 0.4rem; }
+  .field input, .field select, .field textarea { width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid var(--border); border-radius: 0.6rem; font-family: 'Jost', sans-serif; font-size: 0.9rem; background: white; color: var(--ink); outline: none; transition: border-color 0.2s; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .slider-group { margin-bottom: 1.5rem; }
+  .slider-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); }
+  .slider-row:last-child { border-bottom: none; }
+  .slider-name { width: 110px; font-size: 0.82rem; color: var(--muted); flex-shrink: 0; }
+  .slider-row input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; background: var(--warm); border-radius: 2px; outline: none; border: none; padding: 0; }
+  .slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); cursor: pointer; }
+  .slider-val { width: 24px; text-align: right; font-size: 0.85rem; font-weight: 500; }
+  .tags-picker { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .tag-pick { padding: 0.3rem 0.85rem; border-radius: 2rem; border: 1px solid var(--border); font-size: 0.75rem; cursor: pointer; background: transparent; font-family: 'Jost', sans-serif; color: var(--ink); transition: all 0.15s; }
+  .tag-pick.selected { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .submit-btn { width: 100%; padding: 1rem; background: var(--ink); color: var(--paper); border: none; border-radius: 0.75rem; font-family: 'Jost', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; margin-top: 1.5rem; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+  .submit-btn:hover { background: var(--accent); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Setup banner */
+  .setup-banner {
+    margin: 1rem 1.5rem;
+    background: #FFF8E8;
+    border: 1.5px solid var(--gold);
+    border-radius: 0.75rem;
+    padding: 1rem 1.1rem;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: #7A5A20;
+  }
+  .setup-banner strong { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; }
+  .setup-banner code { background: rgba(0,0,0,0.07); padding: 0.1rem 0.4rem; border-radius: 0.3rem; font-size: 0.78rem; word-break: break-all; }
+  .setup-banner input {
+    width: 100%; margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--gold);
+    border-radius: 0.5rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem;
+    background: white;
+    color: var(--ink);
+    outline: none;
+  }
+  .save-url-btn {
+    margin-top: 0.5rem;
+    background: var(--gold);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LIST VIEW ═══════════ -->
+<div id="listView" class="view active">
+  <header>
+    <div class="logo">Table <sup>journal</sup></div>
+    <button class="add-btn" onclick="showView('addView')" title="Add entry">+</button>
+  </header>
+
+  <!-- Setup banner (shown until API URL is set) -->
+  <div class="setup-banner" id="setupBanner">
+    <strong>⚙️ One-time setup: Connect your Google Sheet</strong>
+    Follow the steps in the README, then paste your SheetDB URL below to activate your live database.
+    <input type="text" id="apiUrlInput" placeholder="https://sheetdb.io/api/v1/YOUR_ID" />
+    <button class="save-url-btn" onclick="saveApiUrl()">Connect ✓</button>
+  </div>
+
+  <div class="journal-header">
+    <h1>My Dining Journal</h1>
+    <p id="entryCount">Loading entries…</p>
+  </div>
+
+  <div class="filter-row">
+    <button class="chip active" onclick="filterEntries('All', this)">All</button>
+    <button class="chip" onclick="filterEntries('Italian', this)">Italian</button>
+    <button class="chip" onclick="filterEntries('Japanese', this)">Japanese</button>
+    <button class="chip" onclick="filterEntries('Mexican', this)">Mexican</button>
+    <button class="chip" onclick="filterEntries('French', this)">French</button>
+    <button class="chip" onclick="filterEntries('Thai', this)">Thai</button>
+    <button class="chip" onclick="filterEntries('Fine Dining', this)">Fine Dining</button>
+    <button class="chip" onclick="filterEntries('Casual', this)">Casual</button>
+  </div>
+
+  <div class="entries" id="entriesList">
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading your journal…</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DETAIL VIEW ═══════════ -->
+<div id="detailView" class="view">
+  <header>
+    <button class="back-btn" onclick="showView('listView')">← Back</button>
+    <div style="font-size:0.75rem;color:var(--muted)" id="detailDate"></div>
+  </header>
+  <div class="detail-hero" id="detailHero"></div>
+  <div class="detail-body">
+    <div class="detail-name" id="detailName"></div>
+    <div class="detail-sub" id="detailSub"></div>
+    <div class="detail-tags" id="detailTags"></div>
+    <div class="section-title">Overall Score</div>
+    <div class="overall-score-block">
+      <div>
+        <div class="big-score" id="detailScore">— <span>/10</span></div>
+        <div class="score-label">Overall Rating</div>
+      </div>
+      <div style="flex:1">
+        <div class="score-breakdown-label" id="detailVerdict"></div>
+      </div>
+    </div>
+    <div class="section-title">Breakdown</div>
+    <div class="aspects" id="detailAspects"></div>
+    <div class="section-title">Dined With</div>
+    <div class="companions-block" id="detailCompanions"></div>
+    <div class="section-title">Notes</div>
+    <div class="notes-block" id="detailNotes"></div>
+    <div class="section-title">Share</div>
+    <div class="share-row">
+      <button class="share-btn">
+        <span class="coming-badge">Soon</span>📱 Share to Social
+      </button>
+      <button class="share-btn">
+        <span class="coming-badge">Soon</span>🔗 Send to Friend
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ADD VIEW ═══════════ -->
+<div id="addView" class="view">
+  <header>
+    <button class="back-btn" onclick="showView('listView')">← Cancel</button>
+    <div style="font-size:0.82rem;font-weight:500">New Entry</div>
+  </header>
+  <div class="form-body">
+    <h2>Where did you eat?</h2>
+    <div class="field">
+      <label>Restaurant Name *</label>
+      <input type="text" id="f_name" placeholder="e.g. Osteria Vecchia" />
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Date Visited *</label>
+        <input type="date" id="f_date" />
+      </div>
+      <div class="field">
+        <label>Cuisine *</label>
+        <select id="f_cuisine">
+          <option>Italian</option>
+          <option>Japanese</option>
+          <option>Mexican</option>
+          <option>French</option>
+          <option>Thai</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Who did you go with?</label>
+      <input type="text" id="f_companions" placeholder="e.g. Sofia, Marco (or Solo)" />
+    </div>
+    <div class="field">
+      <label>Tags</label>
+      <div class="tags-picker" id="tagsPicker">
+        <button class="tag-pick" onclick="toggleTag(this)">Fine Dining</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Casual</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Brunch</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Special Occasion</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Business</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Date Night</button>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:1.5rem">
+      <label>Rate Each Aspect (out of 10)</label>
+    </div>
+    <div class="slider-group">
+      <div class="slider-row">
+        <div class="slider-name">🍽️ Cuisine</div>
+        <input type="range" id="s_cuisine" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <div class="slider-val">7</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-name">🌿 Atmosphere</div>
+        <input type="range" id="s_atmosphere" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <div class="slider-val">7</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-name">🤝 Service</div>
+        <input type="range" id="s_service" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <div class="slider-val">7</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-name">💰 Value</div>
+        <input type="range" id="s_value" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <div class="slider-val">7</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-name">🔇 Noise</div>
+        <input type="range" id="s_noise" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <div class="slider-val">7</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Notes & Highlights</label>
+      <textarea id="f_notes" placeholder="What stood out? Any dishes to remember? Would you go back?"></textarea>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="saveEntry()">
+      Save to Journal ✓
+    </button>
+    <div id="saveStatus" style="text-align:center;font-size:0.8rem;color:var(--muted);margin-top:0.75rem;min-height:1.2em"></div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────
+// SheetDB API URL — set by user via setup banner
+let API_URL = localStorage.getItem('sheetdb_url') || '';
+
+const CUISINE_EMOJIS = {
+  Italian:'🍝', Japanese:'🍣', Mexican:'🌮', French:'🥐', Thai:'🍜', Other:'🍴'
+};
+const CUISINE_BG = {
+  Italian:'linear-gradient(135deg,#C4522A,#D4A853)',
+  Japanese:'linear-gradient(135deg,#1C4A6B,#7BAFC8)',
+  Mexican:'linear-gradient(135deg,#9B7020,#E8B84B)',
+  French:'linear-gradient(135deg,#6040A0,#C0A0E0)',
+  Thai:'linear-gradient(135deg,#206040,#80C0A0)',
+  Other:'linear-gradient(135deg,#555,#999)'
+};
+const CUISINE_EMOJI_BG = {
+  Italian:'#FDE8D8', Japanese:'#D8EBF5', Mexican:'#FDF3D8',
+  French:'#E8D8F5', Thai:'#D8F5E8', Other:'#EEE'
+};
+const TAG_CLASS = {
+  'Italian':'tag-italian','Japanese':'tag-japanese','Mexican':'tag-mexican',
+  'French':'tag-french','Thai':'tag-thai','Casual':'tag-casual',
+  'Fine Dining':'tag-finedining','Brunch':'tag-brunch','Other':'tag-other',
+  'Special Occasion':'tag-finedining','Business':'tag-other','Date Night':'tag-brunch'
+};
+
+let allEntries = [];
+let currentEntry = null;
+
+// ─── SETUP ────────────────────────────────────────────────────────────────
+function saveApiUrl() {
+  const val = document.getElementById('apiUrlInput').value.trim();
+  if (!val.startsWith('https://sheetdb.io')) {
+    alert('Please enter a valid SheetDB URL starting with https://sheetdb.io');
+    return;
+  }
+  API_URL = val;
+  localStorage.setItem('sheetdb_url', val);
+  document.getElementById('setupBanner').style.display = 'none';
+  loadEntries();
+}
+
+function checkSetup() {
+  if (API_URL) {
+    document.getElementById('setupBanner').style.display = 'none';
+  } else {
+    document.getElementById('setupBanner').style.display = 'block';
+  }
+}
+
+// ─── VIEWS ────────────────────────────────────────────────────────────────
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'listView') loadEntries();
+  if (id === 'addView') {
+    // Set today's date
+    document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('saveStatus').textContent = '';
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = 'Save to Journal ✓';
+    // Reset sliders
+    ['s_cuisine','s_atmosphere','s_service','s_value','s_noise'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = 7;
+      el.nextElementSibling.textContent = 7;
+    });
+    // Reset tags
+    document.querySelectorAll('.tag-pick').forEach(t => t.classList.remove('selected'));
+    // Reset fields
+    ['f_name','f_companions','f_notes'].forEach(id => document.getElementById(id).value = '');
+  }
+}
+
+// ─── LOAD ENTRIES ─────────────────────────────────────────────────────────
+async function loadEntries() {
+  const list = document.getElementById('entriesList');
+  if (!API_URL) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="emoji">📋</div>
+      <h3>No database connected yet</h3>
+      <p>Follow the setup steps above to connect your Google Sheet, then your entries will appear here.</p>
+    </div>`;
+    document.getElementById('entryCount').textContent = 'Connect your database to get started';
+    return;
+  }
+
+  list.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading your journal…</p></div>`;
+
+  try {
+    const res = await fetch(`${API_URL}?limit=100`);
+    if (!res.ok) throw new Error('Failed to fetch');
+    const data = await res.json();
+    allEntries = data.reverse(); // newest first
+    renderEntries(allEntries);
+  } catch (e) {
+    list.innerHTML = `<div class="error-state">
+      <p>⚠️ Couldn't load entries. Check your SheetDB URL is correct and your sheet is set up properly.</p>
+    </div>`;
+    document.getElementById('entryCount').textContent = 'Connection error';
+  }
+}
+
+function renderEntries(entries) {
+  const list = document.getElementById('entriesList');
+  document.getElementById('entryCount').textContent =
+    entries.length === 0 ? 'No entries yet' :
+    `${entries.length} restaurant${entries.length > 1 ? 's' : ''} visited`;
+
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="emoji">🍽️</div>
+      <h3>Your journal is empty</h3>
+      <p>Tap + to log your first restaurant visit!</p>
+    </div>`;
+    return;
+  }
+
+  // Group by month
+  const groups = {};
+  entries.forEach(e => {
+    const d = new Date(e.date);
+    const key = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(e);
+  });
+
+  let html = '';
+  Object.entries(groups).forEach(([month, items]) => {
+    html += `<div class="month-label">${month}</div>`;
+    items.forEach((e, i) => {
+      const score = calcOverall(e);
+      const cuisine = e.cuisine || 'Other';
+      const emoji = CUISINE_EMOJIS[cuisine] || '🍴';
+      const bg = CUISINE_EMOJI_BG[cuisine] || '#EEE';
+      const tags = (e.tags || '').split(',').filter(Boolean);
+      const tagHtml = tags.map(t => {
+        const c = TAG_CLASS[t.trim()] || 'tag-other';
+        return `<span class="tag-pill ${c}">${t.trim()}</span>`;
+      }).join('');
+
+      const dateStr = new Date(e.date).toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      const companions = e.companions ? `👥 ${e.companions}` : '';
+
+      html += `<div class="entry-card" style="animation-delay:${i*0.05}s" onclick="showEntryDetail(${entries.indexOf(e)})">
+        <div class="entry-emoji" style="background:${bg}">${emoji}</div>
+        <div class="entry-info">
+          <div class="entry-name">${e.name}</div>
+          <div class="entry-meta">
+            <span>📅 ${dateStr}</span>
+            ${companions ? `<span>${companions}</span>` : ''}
+          </div>
+          <div class="entry-tags">${tagHtml}</div>
+        </div>
+        <div class="entry-score">
+          <div class="score-num">${score}</div>
+          <div class="score-denom">/10</div>
+          <div class="score-bar"><div class="score-fill" style="width:${score*10}%"></div></div>
+        </div>
+      </div>`;
+    });
+  });
+
+  list.innerHTML = html;
+}
+
+// ─── FILTER ───────────────────────────────────────────────────────────────
+function filterEntries(filter, btn) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  if (filter === 'All') { renderEntries(allEntries); return; }
+  const filtered = allEntries.filter(e =>
+    e.cuisine === filter || (e.tags || '').includes(filter)
+  );
+  renderEntries(filtered);
+}
+
+// ─── DETAIL ───────────────────────────────────────────────────────────────
+function showEntryDetail(idx) {
+  const e = allEntries[idx];
+  currentEntry = e;
+  const cuisine = e.cuisine || 'Other';
+
+  document.getElementById('detailDate').textContent =
+    new Date(e.date).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  const hero = document.getElementById('detailHero');
+  hero.style.background = CUISINE_BG[cuisine] || CUISINE_BG['Other'];
+  hero.textContent = CUISINE_EMOJIS[cuisine] || '🍴';
+  hero.style.fontSize = '5rem';
+
+  document.getElementById('detailName').textContent = e.name;
+  document.getElementById('detailSub').innerHTML = `<span>${cuisine}</span>`;
+
+  const tags = (e.tags || '').split(',').filter(Boolean);
+  document.getElementById('detailTags').innerHTML = tags.map(t => {
+    const c = TAG_CLASS[t.trim()] || 'tag-other';
+    return `<span class="tag-pill ${c}">${t.trim()}</span>`;
+  }).join('');
+
+  const score = calcOverall(e);
+  document.getElementById('detailScore').innerHTML = `${score} <span>/10</span>`;
+  document.getElementById('detailVerdict').textContent = verdict(score);
+
+  const aspects = [
+    { name: '🍽️ Cuisine',    val: parseFloat(e.score_cuisine)    || 0 },
+    { name: '🌿 Atmosphere', val: parseFloat(e.score_atmosphere) || 0 },
+    { name: '🤝 Service',    val: parseFloat(e.score_service)    || 0 },
+    { name: '💰 Value',      val: parseFloat(e.score_value)      || 0 },
+    { name: '🔇 Noise',      val: parseFloat(e.score_noise)      || 0 },
+  ];
+  document.getElementById('detailAspects').innerHTML = aspects.map(a => `
+    <div class="aspect-row">
+      <div class="aspect-name">${a.name}</div>
+      <div class="aspect-track"><div class="aspect-fill ${getColor(a.val)}" style="width:${a.val*10}%"></div></div>
+      <div class="aspect-val">${a.val}</div>
+    </div>`).join('');
+
+  const companions = (e.companions || '').split(',').filter(Boolean);
+  if (companions.length === 0 || e.companions === 'Solo') {
+    document.getElementById('detailCompanions').innerHTML = `<div class="companion-pill">🚶 Solo visit</div>`;
+  } else {
+    document.getElementById('detailCompanions').innerHTML = companions.map(c =>
+      `<div class="companion-pill">
+        <div class="companion-avatar">${c.trim()[0]}</div>${c.trim()}
+      </div>`).join('');
+  }
+
+  document.getElementById('detailNotes').textContent = e.notes ? `"${e.notes}"` : 'No notes added.';
+  showView('detailView');
+}
+
+// ─── SAVE ENTRY ───────────────────────────────────────────────────────────
+async function saveEntry() {
+  const name = document.getElementById('f_name').value.trim();
+  const date = document.getElementById('f_date').value;
+  if (!name || !date) { alert('Please fill in the restaurant name and date.'); return; }
+
+  const tags = [...document.querySelectorAll('.tag-pick.selected')].map(t => t.textContent).join(', ');
+  const row = {
+    name,
+    date,
+    cuisine:          document.getElementById('f_cuisine').value,
+    companions:       document.getElementById('f_companions').value.trim() || 'Solo',
+    tags,
+    score_cuisine:    document.getElementById('s_cuisine').value,
+    score_atmosphere: document.getElementById('s_atmosphere').value,
+    score_service:    document.getElementById('s_service').value,
+    score_value:      document.getElementById('s_value').value,
+    score_noise:      document.getElementById('s_noise').value,
+    notes:            document.getElementById('f_notes').value.trim(),
+  };
+
+  const btn = document.getElementById('submitBtn');
+  const status = document.getElementById('saveStatus');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  status.textContent = '';
+
+  if (!API_URL) {
+    // Demo mode — just show success without saving
+    setTimeout(() => {
+      btn.textContent = '✓ Saved!';
+      status.textContent = 'Connect your database to save for real.';
+      setTimeout(() => showView('listView'), 1200);
+    }, 600);
+    return;
+  }
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ data: [row] })
+    });
+    if (!res.ok) throw new Error('Save failed');
+    btn.textContent = '✓ Saved!';
+    status.textContent = 'Entry added to your Google Sheet.';
+    setTimeout(() => showView('listView'), 1200);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Save to Journal ✓';
+    status.textContent = '⚠️ Could not save. Check your connection and try again.';
+  }
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────
+function calcOverall(e) {
+  const vals = [
+    parseFloat(e.score_cuisine), parseFloat(e.score_atmosphere),
+    parseFloat(e.score_service), parseFloat(e.score_value), parseFloat(e.score_noise)
+  ].filter(v => !isNaN(v));
+  if (!vals.length) return '—';
+  return (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1);
+}
+
+function verdict(score) {
+  if (score >= 9) return 'Exceptional — absolutely worth returning';
+  if (score >= 8) return 'Excellent — highly recommended';
+  if (score >= 7) return 'Great — would go back';
+  if (score >= 6) return 'Good — enjoyable with some caveats';
+  return 'Mixed — wouldn\'t rush back';
+}
+
+function getColor(val) {
+  if (val >= 8) return 'fill-high';
+  if (val >= 6) return 'fill-mid';
+  return 'fill-low';
+}
+
+function updateSlider(el) { el.nextElementSibling.textContent = el.value; }
+function toggleTag(el) { el.classList.toggle('selected'); }
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+checkSetup();
+loadEntries();
+</script>
+</body>
+</html>
