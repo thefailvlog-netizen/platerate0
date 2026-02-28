@@ -71,6 +71,12 @@
     display: flex; align-items: center; gap: 0.4rem;
   }
   .back-btn:hover { color: var(--ink); }
+  .edit-btn {
+    background: var(--warm); border: 1px solid var(--border); border-radius: 2rem;
+    padding: 0.3rem 0.75rem; font-size: 0.78rem; font-family: 'Jost', sans-serif;
+    cursor: pointer; color: var(--ink); transition: all 0.15s;
+  }
+  .edit-btn:hover { background: var(--ink); color: var(--paper); }
 
   /* ── LIST ── */
   .journal-header { padding: 2rem 1.5rem 1rem; }
@@ -585,6 +591,7 @@
   <header>
     <button class="back-btn" onclick="showView('listView')">← Back</button>
     <div style="font-size:0.75rem;color:var(--muted)" id="detailDate"></div>
+    <button class="edit-btn" id="detailEditBtn" onclick="startEditEntry()">✏️ Edit</button>
   </header>
 
   <div class="detail-hero" id="detailHero"></div>
@@ -631,11 +638,11 @@
 <!-- ═══════════ ADD VIEW ═══════════ -->
 <div id="addView" class="view">
   <header>
-    <button class="back-btn" onclick="showView('listView')">← Cancel</button>
-    <div style="font-size:0.82rem;font-weight:500">New Entry</div>
+    <button class="back-btn" id="addBackBtn" onclick="cancelAddEdit()">← Cancel</button>
+    <div style="font-size:0.82rem;font-weight:500" id="addViewTitle">New Entry</div>
   </header>
   <div class="form-body">
-    <h2>Where did you eat?</h2>
+    <h2 id="addFormHeading">Where did you eat?</h2>
 
     <div class="field">
       <label>Restaurant Name *</label>
@@ -838,7 +845,8 @@ const TAG_CLASS = {
 };
 
 let allEntries = [];
-let pendingPhotos = []; // base64 strings for new entry
+let pendingPhotos = [];
+let editingEntry = null; // holds the entry being edited, or null for new
 
 // ─── PROFILE / ONBOARDING ─────────────────────────────────────────
 function getProfile() {
@@ -950,11 +958,72 @@ function showView(id) {
   if (id === 'addView')  resetForm();
 }
 
+function cancelAddEdit() {
+  if (editingEntry) {
+    // Go back to the detail view of the entry we were editing
+    const idx = allEntries.findIndex(e => e.id === editingEntry.id);
+    editingEntry = null;
+    if (idx !== -1) showEntryDetail(idx);
+    else showView('listView');
+  } else {
+    showView('listView');
+  }
+}
+
+function startEditEntry() {
+  const e = allEntries.find(en => en.id === (window._detailEntryId));
+  if (!e) return;
+  editingEntry = e;
+
+  // Switch to add view in edit mode
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('addView').classList.add('active');
+  window.scrollTo(0, 0);
+
+  // Update headings
+  document.getElementById('addViewTitle').textContent  = 'Edit Entry';
+  document.getElementById('addFormHeading').textContent = 'Edit your review';
+  document.getElementById('submitBtn').textContent      = 'Save Changes ✓';
+
+  // Pre-fill all fields
+  document.getElementById('f_name').value       = e.name        || '';
+  document.getElementById('f_date').value       = e.date        || '';
+  document.getElementById('f_location').value   = e.location    || '';
+  document.getElementById('f_companions').value = e.companions  || '';
+  document.getElementById('f_notes').value      = e.notes       || '';
+
+  // Cuisine select
+  const cuisineSelect = document.getElementById('f_cuisine');
+  [...cuisineSelect.options].forEach(o => { o.selected = o.value === e.cuisine; });
+
+  // Sliders
+  [['s_cuisine','score_cuisine'],['s_atmosphere','score_atmosphere'],['s_service','score_service'],
+   ['s_value','score_value'],['s_noise','score_noise']].forEach(([sid, key]) => {
+    const el = document.getElementById(sid);
+    el.value = parseFloat(e[key]) || 7;
+    el.nextElementSibling.textContent = el.value;
+  });
+
+  // Tags
+  const entryTags = (e.tags || '').split(',').map(t => t.trim().toLowerCase());
+  document.querySelectorAll('.tag-pick').forEach(btn => {
+    btn.classList.toggle('selected', entryTags.includes(btn.textContent.trim().toLowerCase()));
+  });
+
+  // Existing photos — load as already-uploaded cloudinary URLs
+  pendingPhotos = getPhotos(e).map(url => ({ file: null, localUrl: url, cloudUrl: url, uploading: false }));
+  renderPhotoPreviews();
+  document.getElementById('saveStatus').textContent = '';
+}
+
 function resetForm() {
+  editingEntry = null;
+  document.getElementById('addViewTitle').textContent  = 'New Entry';
+  document.getElementById('addFormHeading').textContent = 'Where did you eat?';
+  document.getElementById('submitBtn').textContent      = 'Save to Journal ✓';
+  document.getElementById('submitBtn').disabled         = false;
   document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
   document.getElementById('saveStatus').textContent = '';
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = false; btn.textContent = 'Save to Journal ✓';
   ['s_cuisine','s_atmosphere','s_service','s_value','s_noise'].forEach(id => {
     const el = document.getElementById(id); el.value = 7; el.nextElementSibling.textContent = 7;
   });
@@ -1051,6 +1120,7 @@ function filterEntries(filter, btn) {
 // ─── DETAIL ───────────────────────────────────────────────────────
 function showEntryDetail(idx) {
   const e = allEntries[idx];
+  window._detailEntryId = e.id; // store for edit button
   const cuisine = e.cuisine || 'Other';
   const photos = getPhotos(e);
 
@@ -1205,7 +1275,7 @@ function closeLightbox() {
   document.getElementById('lightbox').classList.remove('open');
 }
 
-// ─── SAVE ─────────────────────────────────────────────────────────
+// ─── SAVE / UPDATE ────────────────────────────────────────────────
 async function saveEntry() {
   const name = document.getElementById('f_name').value.trim();
   const date = document.getElementById('f_date').value;
@@ -1215,9 +1285,8 @@ async function saveEntry() {
   const status = document.getElementById('saveStatus');
   btn.disabled = true; status.textContent = '';
 
-  // Wait for any still-uploading photos to finish
-  const stillUploading = pendingPhotos.some(p => p.uploading);
-  if (stillUploading) {
+  // Wait for any still-uploading photos
+  if (pendingPhotos.some(p => p.uploading)) {
     btn.textContent = '⏳ Waiting for photos…';
     await new Promise(resolve => {
       const interval = setInterval(() => {
@@ -1225,10 +1294,8 @@ async function saveEntry() {
       }, 400);
     });
   }
-
   btn.textContent = 'Saving…';
 
-  // Collect successfully uploaded Cloudinary URLs
   const photoUrls = pendingPhotos
     .filter(p => p.cloudUrl && !p.error)
     .map(p => p.cloudUrl)
@@ -1253,17 +1320,30 @@ async function saveEntry() {
   };
 
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ data: [row] })
-    });
+    let res;
+    if (editingEntry && editingEntry.id) {
+      // PATCH — update existing row by SheetDB row id
+      res = await fetch(`${API_URL}/id/${editingEntry.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ data: row })
+      });
+    } else {
+      // POST — new entry
+      res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ data: [row] })
+      });
+    }
     if (!res.ok) throw new Error();
-    btn.textContent = '✓ Saved!';
-    status.textContent = photoUrls ? '📸 Photos uploaded to cloud!' : 'Entry saved.';
+    btn.textContent = editingEntry ? '✓ Updated!' : '✓ Saved!';
+    status.textContent = photoUrls ? '📸 Photos saved!' : editingEntry ? 'Entry updated.' : 'Entry saved.';
+    editingEntry = null;
     setTimeout(() => showView('listView'), 1200);
   } catch {
-    btn.disabled = false; btn.textContent = 'Save to Journal ✓';
+    btn.disabled = false;
+    btn.textContent = editingEntry ? 'Save Changes ✓' : 'Save to Journal ✓';
     status.textContent = '⚠️ Could not save. Check your connection.';
   }
 }
