@@ -972,21 +972,6 @@ function refreshProfileView() {
     document.getElementById('statTop').textContent = top ? top[0].slice(0,3) : '—';
   }
 }
-  // Update all bottom nav tabs
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.bottom-nav .nav-tab').forEach(t => {
-    if (t.textContent.includes(btn.textContent.trim().split('\n').pop().trim())) t.classList.add('active');
-  });
-  btn.classList.add('active');
-  if (viewId === 'profileView') {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('profileView').classList.add('active');
-    window.scrollTo(0,0);
-    refreshProfileView();
-  } else {
-    showView(viewId);
-  }
-}
 
 function switchTab(viewId, btn) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
