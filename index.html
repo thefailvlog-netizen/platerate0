@@ -450,8 +450,26 @@
   .onboard-wrap {
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center; padding: 2rem 1.5rem;
-    text-align: center;
+    text-align: center; position: relative; overflow: hidden;
   }
+
+  /* Food emoji float animation */
+  .food-floats {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden; pointer-events: none; z-index: 0;
+  }
+  .food-float {
+    position: absolute; font-size: 1.8rem; opacity: 0;
+    animation: floatUp var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay); bottom: -40px;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(-5deg) scale(0.8); opacity: 0; }
+    15%  { opacity: 0.5; }
+    85%  { opacity: 0.5; }
+    100% { transform: translateY(-110vh) rotate(15deg) scale(1.1); opacity: 0; }
+  }
+  .onboard-wrap > *:not(.food-floats) { position: relative; z-index: 1; }
   .onboard-logo { font-size: 3.5rem; margin-bottom: 1rem; }
   .onboard-title {
     font-family: 'Bebas Neue', sans-serif;
@@ -620,6 +638,10 @@
 <!-- ═══════════ ONBOARDING VIEW ═══════════ -->
 <div id="onboardView" class="view">
   <div class="onboard-wrap">
+
+    <!-- Floating food emojis -->
+    <div class="food-floats" id="foodFloats"></div>
+
     <div class="onboard-logo">🍽️</div>
     <h1 class="onboard-title">Don't Order <em>Wrong</em> <span style="font-size:1rem;font-weight:300;color:var(--muted);font-style:normal;letter-spacing:1px">dot com</span></h1>
     <p class="onboard-sub">Your personal dining journal.<br>Rate restaurants, log memories, share your taste.</p>
@@ -630,9 +652,10 @@
         <div class="onboard-field">
           <label>Your Name *</label>
           <input type="text" id="ob_name" placeholder="e.g. Mike"
-            oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')" autocomplete="given-name" />
+            oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')" autocomplete="given-name"
+            onkeydown="if(event.key==='Enter') completeOnboarding()" />
         </div>
-        <button class="onboard-btn" id="ob_signup_btn" onclick="completeOnboarding()">Create My Journal →</button>
+        <button class="onboard-btn" id="ob_signup_btn" onclick="completeOnboarding()">Login →</button>
         <p class="onboard-note">No password needed — your name is your key.<br>
           Already have a journal? <a href="#" onclick="showPanel('ob_login');return false;" style="color:var(--accent)">Sign in →</a></p>
       </div>
@@ -642,9 +665,10 @@
         <div class="onboard-field">
           <label>Your Name *</label>
           <input type="text" id="ob_login_user" placeholder="Enter your name"
-            oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')" />
+            oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')"
+            onkeydown="if(event.key==='Enter') loginWithUsername()" />
         </div>
-        <button class="onboard-btn" id="ob_login_btn" onclick="loginWithUsername()">Open My Journal →</button>
+        <button class="onboard-btn" id="ob_login_btn" onclick="loginWithUsername()">Login →</button>
         <p class="onboard-note"><a href="#" onclick="showPanel('ob_signup');return false;" style="color:var(--accent)">← Create a new journal</a></p>
       </div>
 
@@ -653,7 +677,12 @@
     <!-- Footer links -->
     <div class="onboard-footer">
       <button class="install-cta" onclick="showInstallModal()">📲 Download the App!</button>
-      <a href="#" onclick="window._changelogFrom='onboardView'; showView('changelogView');return false;">📋 What's New — Changelog</a>
+      <a href="#" onclick="window._changelogFrom='onboardView'; showView('changelogView');return false;">📋 What's New — Read the Changelog</a>
+    </div>
+
+    <!-- Built by -->
+    <div style="margin-top:2rem;font-size:0.68rem;color:var(--muted);line-height:1.6">
+      Built by <strong>TweetX</strong> using <strong>Claude AI</strong> and the human brain
     </div>
 
   </div>
@@ -909,7 +938,7 @@
         💌 Suggestion Box <span>Email the developer →</span>
       </div>
       <div class="menu-row" onclick="window._changelogFrom='profileView'; showView('changelogView')">
-        📋 What's New <span>Changelog →</span>
+        📋 What's New <span>Read the Changelog →</span>
       </div>
       <div class="menu-row" onclick="if(confirm('Log out? You can sign back in with your username anytime.')) { localStorage.removeItem('profile_username'); localStorage.removeItem('profile_name'); location.reload(); }">
         🚪 Log Out <span>→</span>
@@ -1752,6 +1781,24 @@ function triggerAndroidInstall() {
     });
   }
 }
+
+// ─── FLOATING FOOD EMOJIS ─────────────────────────────────────────
+(function() {
+  const emojis = ['🍕','🍣','🌮','🍜','🥐','🍔','🥗','🍷','🍦','🧁','🥩','🍱','🫕','🥘','🍝','🫔','🥨','🍤','🧆','🍙'];
+  const container = document.getElementById('foodFloats');
+  if (!container) return;
+  const count = 18;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'food-float';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    const left = Math.random() * 96;
+    const dur  = 6 + Math.random() * 8;
+    const delay = Math.random() * -14; // negative so they start mid-flight
+    el.style.cssText = `left:${left}%;--dur:${dur}s;--delay:${delay}s`;
+    container.appendChild(el);
+  }
+})();
 
 // ─── INIT ─────────────────────────────────────────────────────────
 const { username: savedUsername } = getProfile();
