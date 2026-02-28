@@ -3,9 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Plate Rate</title>
+<title>Don't Order Wrong</title>
+<meta name="description" content="Your personal restaurant journal. Rate dishes, log memories, and never order wrong again." />
+<meta property="og:title" content="Don't Order Wrong" />
+<meta property="og:description" content="Your personal restaurant journal. Rate dishes, log memories, and never order wrong again." />
+<meta property="og:url" content="https://dontorderwrong.com" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Don't Order Wrong" />
+<meta name="twitter:description" content="Your personal restaurant journal." />
+<!-- PWA / home screen -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Don't Order Wrong" />
+<meta name="theme-color" content="#181410" />
 
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #181410;
@@ -31,12 +44,17 @@
     position: sticky; top: 0; z-index: 50;
   }
   .logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem; font-weight: 600; letter-spacing: -0.3px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.7rem; font-weight: 400; letter-spacing: 1.5px;
     display: flex; align-items: center; gap: 0.4rem;
   }
   .logo-plate { font-size: 1.3rem; }
-  .logo em { font-style: italic; color: var(--accent); }
+  .logo em { font-style: normal; color: var(--accent); }
+  .logo-dotcom {
+    font-family: 'Jost', sans-serif; font-weight: 300;
+    font-size: 0.72rem; color: var(--muted); letter-spacing: 1px;
+    text-transform: lowercase; align-self: flex-end; margin-bottom: 3px;
+  }
   .add-btn {
     background: var(--ink); color: var(--paper); border: none;
     width: 36px; height: 36px; border-radius: 50%; font-size: 1.3rem;
@@ -413,10 +431,11 @@
   }
   .onboard-logo { font-size: 3.5rem; margin-bottom: 1rem; }
   .onboard-title {
-    font-family: 'Cormorant Garamond', serif; font-size: 2.5rem;
-    font-weight: 400; font-style: italic; margin-bottom: 0.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem; font-weight: 400; letter-spacing: 2px;
+    margin-bottom: 0.5rem; line-height: 1.1;
   }
-  .onboard-title em { color: var(--accent); }
+  .onboard-title em { font-style: normal; color: var(--accent); }
   .onboard-sub { font-size: 0.9rem; color: var(--muted); margin-bottom: 2.5rem; line-height: 1.6; }
   .onboard-form { width: 100%; max-width: 360px; }
   .onboard-field { margin-bottom: 0.9rem; text-align: left; }
@@ -460,7 +479,7 @@
 <div id="onboardView" class="view">
   <div class="onboard-wrap">
     <div class="onboard-logo">🍽️</div>
-    <h1 class="onboard-title">My <em>Plate</em> Rate</h1>
+    <h1 class="onboard-title">Don't Order <em>Wrong</em> <span style="font-size:1rem;font-weight:300;color:var(--muted);font-style:normal;letter-spacing:1px">dot com</span></h1>
     <p class="onboard-sub">Your personal dining journal.<br>Rate restaurants, log memories, share your taste.</p>
     <div class="onboard-form">
       <div class="onboard-field">
@@ -480,7 +499,7 @@
 <!-- ═══════════ LIST VIEW ═══════════ -->
 <div id="listView" class="view">
   <header>
-    <div class="logo"><span class="logo-plate">🍽️</span> My <em>Plate</em> Rate</div>
+    <div class="logo"><span class="logo-plate">🍽️</span> Don't Order <em>Wrong</em> <span class="logo-dotcom">dot com</span></div>
     <button class="add-btn" onclick="showView('addView')" title="Add entry">+</button>
   </header>
 
@@ -674,7 +693,7 @@
 <!-- ═══════════ PROFILE VIEW ═══════════ -->
 <div id="profileView" class="view">
   <header>
-    <div class="logo"><span class="logo-plate">🍽️</span> My <em>Plate</em> Rate</div>
+    <div class="logo"><span class="logo-plate">🍽️</span> Don't Order <em>Wrong</em> <span class="logo-dotcom">dot com</span></div>
     <div style="width:36px"></div>
   </header>
 
@@ -791,7 +810,7 @@ function showMainApp() {
 function updateJournalTitle() {
   const { name } = getProfile();
   const titleEl = document.getElementById('journalTitle');
-  if (titleEl) titleEl.textContent = name ? `${name}'s Dining Journal` : 'My Dining Journal';
+  if (titleEl) titleEl.textContent = name ? `${name}'s Dining Journal` : "Don't Order Wrong";
 }
 
 function saveProfile() {
