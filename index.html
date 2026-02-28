@@ -530,6 +530,89 @@
   }
   #detailView.active .swipe-hint,
   #addView.active .swipe-hint { opacity: 1; }
+
+  /* Download / Install button */
+  .install-cta {
+    width: 100%; padding: 0.85rem; margin-top: 0.75rem;
+    background: transparent; border: 1.5px solid var(--border);
+    border-radius: 0.75rem; font-family: 'Jost', sans-serif;
+    font-size: 0.88rem; color: var(--ink); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    transition: all 0.2s;
+  }
+  .install-cta:hover { border-color: var(--ink); background: var(--warm); }
+  .install-cta.profile-style {
+    border-radius: 0; border: none; border-top: 1px solid var(--border);
+    justify-content: space-between; padding: 0.9rem 0;
+    font-size: 0.88rem; background: transparent; width: 100%;
+  }
+  .install-cta.profile-style:hover { background: transparent; color: var(--accent); }
+
+  /* Install instructions modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 300; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: var(--paper); border-radius: 1.25rem 1.25rem 0 0;
+    padding: 1.5rem 1.5rem 2.5rem; width: 100%; max-width: 480px;
+    animation: slideUp 0.3s ease;
+  }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 1.25rem; }
+  .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; margin-bottom: 0.25rem; }
+  .modal-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.25rem; }
+  .install-steps { list-style: none; padding: 0; margin: 0 0 1.25rem; }
+  .install-steps li {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.65rem 0; border-bottom: 1px solid var(--border); font-size: 0.88rem;
+  }
+  .install-steps li:last-child { border-bottom: none; }
+  .install-steps .step-num {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--ink);
+    color: var(--paper); font-size: 0.7rem; font-weight: 600; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+  .install-platform { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .platform-btn {
+    flex: 1; padding: 0.5rem; border: 1.5px solid var(--border); border-radius: 0.6rem;
+    background: transparent; font-family: 'Jost', sans-serif; font-size: 0.78rem;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .platform-btn.active { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+  .modal-close-btn {
+    width: 100%; padding: 0.85rem; background: var(--ink); color: var(--paper);
+    border: none; border-radius: 0.75rem; font-family: 'Jost', sans-serif;
+    font-size: 0.9rem; cursor: pointer;
+  }
+
+  /* Changelog view */
+  .changelog-body { padding: 1.5rem 1.5rem 5rem; }
+  .changelog-body h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-style: italic; margin-bottom: 0.25rem; }
+  .changelog-body .cl-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 2rem; }
+  .cl-release { margin-bottom: 2rem; }
+  .cl-release-header { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.75rem; }
+  .cl-version { font-weight: 700; font-size: 0.88rem; }
+  .cl-date { font-size: 0.75rem; color: var(--muted); }
+  .cl-badge {
+    font-size: 0.6rem; padding: 0.15rem 0.5rem; border-radius: 2rem;
+    background: var(--accent); color: white; font-weight: 600; letter-spacing: 0.5px;
+  }
+  .cl-items { list-style: none; padding: 0; margin: 0; }
+  .cl-items li {
+    font-size: 0.85rem; padding: 0.4rem 0 0.4rem 1.1rem; position: relative;
+    border-bottom: 1px solid var(--border); line-height: 1.5;
+  }
+  .cl-items li:last-child { border-bottom: none; }
+  .cl-items li::before { content: '–'; position: absolute; left: 0; color: var(--muted); }
+
+  /* Onboarding footer links */
+  .onboard-footer {
+    margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 0.6rem; align-items: center;
+  }
+  .onboard-footer a { font-size: 0.78rem; color: var(--muted); text-decoration: none; }
+  .onboard-footer a:hover { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -566,6 +649,13 @@
       </div>
 
     </div>
+
+    <!-- Footer links -->
+    <div class="onboard-footer">
+      <button class="install-cta" onclick="showInstallModal()">📲 Download the App!</button>
+      <a href="#" onclick="window._changelogFrom='onboardView'; showView('changelogView');return false;">📋 What's New — Changelog</a>
+    </div>
+
   </div>
 </div>
 
@@ -812,8 +902,14 @@
       <div class="menu-row" onclick="switchUser()">
         🔀 Switch / Visit Another Journal <span>→</span>
       </div>
+      <div class="menu-row" onclick="showInstallModal()">
+        📲 Download the App! <span>Add to Home Screen →</span>
+      </div>
       <div class="menu-row" onclick="window.location.href='mailto:thefailvlog@gmail.com?subject=Comments%20on%20the%20DOW%20App'">
         💌 Suggestion Box <span>Email the developer →</span>
+      </div>
+      <div class="menu-row" onclick="window._changelogFrom='profileView'; showView('changelogView')">
+        📋 What's New <span>Changelog →</span>
       </div>
       <div class="menu-row" onclick="if(confirm('Log out? You can sign back in with your username anytime.')) { localStorage.removeItem('profile_username'); localStorage.removeItem('profile_name'); location.reload(); }">
         🚪 Log Out <span>→</span>
@@ -835,6 +931,123 @@
   </nav>
 </div>
 
+
+<!-- ═══════════ CHANGELOG VIEW ═══════════ -->
+<div id="changelogView" class="view">
+  <header>
+    <button class="back-btn" onclick="showView(window._changelogFrom || 'onboardView')">← Back</button>
+    <div style="font-size:0.82rem;font-weight:500">What's New</div>
+    <div style="width:60px"></div>
+  </header>
+  <div class="changelog-body">
+    <h2>Changelog</h2>
+    <p class="cl-sub">Every update to Don't Order Wrong, newest first.</p>
+
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.9</span>
+        <span class="cl-badge">LATEST</span>
+        <span class="cl-date">March 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>Added Edit Entry — update notes, scores, photos and more on any existing entry</li>
+        <li>Unique row IDs added for reliable edit/update targeting in the database</li>
+        <li>Custom tags — type and add your own tags beyond the preset list</li>
+        <li>Removed Noise Level from aspect scoring (now: Cuisine, Atmosphere, Service, Value)</li>
+        <li>Date and Cuisine fields fixed to sit side-by-side cleanly on mobile</li>
+        <li>Download the App button — install DOW as a home screen icon on any device</li>
+        <li>Changelog page added (you're looking at it!)</li>
+        <li>Swipe right from left edge to go back on any screen</li>
+        <li>Suggestion Box added to profile — email the developer directly</li>
+      </ul>
+    </div>
+
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.8</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>Username accounts — each person gets their own private journal</li>
+        <li>Sign up and sign in with just your name, no password needed</li>
+        <li>Switch Journal — visit another user's journal by entering their name</li>
+        <li>Entries now tagged with username so journals stay separate</li>
+      </ul>
+    </div>
+
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.7</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>PWA support — app can be installed on iPhone and Android home screens</li>
+        <li>DOW icon designed and added across all icon sizes</li>
+        <li>Service worker added for offline support and instant loading</li>
+      </ul>
+    </div>
+
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.6</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>Photo uploads via Cloudinary — photos now sync across all devices</li>
+        <li>Photo gallery in entry detail view with lightbox tap-to-expand</li>
+        <li>Custom domain live at dontorderwrong.com</li>
+      </ul>
+    </div>
+
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.5</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>App renamed to Don't Order Wrong dot com</li>
+        <li>Bebas Neue logo typeface added</li>
+        <li>Google Maps integration — each entry links to restaurant location</li>
+        <li>Profile tab with dining stats (visits, average score, top cuisine)</li>
+        <li>Bottom navigation bar added</li>
+      </ul>
+    </div>
+
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.1 – v0.4</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>Initial concept and prototype built</li>
+        <li>Google Sheets + SheetDB backend integration</li>
+        <li>10-point rating system with aspect breakdowns</li>
+        <li>Tag system, companion tracking, notes field</li>
+        <li>Deployed to GitHub Pages</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ INSTALL MODAL ═══════════ -->
+<div class="modal-overlay" id="installModal" onclick="if(event.target===this)closeInstallModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Download the App 📲</div>
+    <p class="modal-sub">Add DOW to your home screen — no app store needed.</p>
+    <div class="install-platform">
+      <button class="platform-btn active" id="iosBtn" onclick="showInstallPlatform('ios')">🍎 iPhone / iPad</button>
+      <button class="platform-btn" id="androidBtn" onclick="showInstallPlatform('android')">🤖 Android</button>
+      <button class="platform-btn" id="desktopBtn" onclick="showInstallPlatform('desktop')">💻 Desktop</button>
+    </div>
+    <ul class="install-steps" id="installSteps"></ul>
+    <div id="androidInstallBtn" style="display:none;margin-bottom:1rem">
+      <button class="modal-close-btn" style="background:var(--accent)" onclick="triggerAndroidInstall()">Install Now →</button>
+    </div>
+    <button class="modal-close-btn" onclick="closeInstallModal()">Done</button>
+  </div>
+</div>
 
 <!-- Install banner (Android/desktop) -->
 <div class="install-banner" id="installBanner">
@@ -983,8 +1196,8 @@ function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
-  if (id === 'listView') { updateJournalTitle(); loadEntries(); }
-  if (id === 'addView')  resetForm();
+  if (id === 'listView')     { updateJournalTitle(); loadEntries(); }
+  if (id === 'addView')      resetForm();
 }
 
 function cancelAddEdit() {
@@ -1476,6 +1689,69 @@ function addCustomTag() {
     }
   }, { passive: true });
 })();
+
+// ─── INSTALL MODAL ────────────────────────────────────────────────
+const INSTALL_STEPS = {
+  ios: [
+    { text: 'Open <strong>dontorderwrong.com</strong> in Safari (must be Safari)' },
+    { text: 'Tap the <strong>Share button</strong> at the bottom of the screen (box with arrow)' },
+    { text: 'Scroll down and tap <strong>"Add to Home Screen"</strong>' },
+    { text: 'Tap <strong>Add</strong> — the DOW icon appears on your home screen!' },
+  ],
+  android: [
+    { text: 'Open <strong>dontorderwrong.com</strong> in Chrome' },
+    { text: 'Tap the <strong>three-dot menu</strong> in the top right' },
+    { text: 'Tap <strong>"Add to Home screen"</strong> or use the Install button below' },
+    { text: 'Tap <strong>Add</strong> — DOW is now on your home screen!' },
+  ],
+  desktop: [
+    { text: 'Open <strong>dontorderwrong.com</strong> in Chrome or Edge' },
+    { text: 'Look for the <strong>install icon</strong> (⊕) in the address bar on the right' },
+    { text: 'Click it and select <strong>"Install"</strong>' },
+    { text: 'DOW opens as its own window, just like a native app!' },
+  ],
+};
+
+let currentPlatform = 'ios';
+
+function showInstallModal() {
+  // Auto-detect platform
+  const ua = navigator.userAgent;
+  if (/android/i.test(ua)) currentPlatform = 'android';
+  else if (/iphone|ipad|ipod/i.test(ua)) currentPlatform = 'ios';
+  else currentPlatform = 'desktop';
+
+  showInstallPlatform(currentPlatform);
+  document.getElementById('installModal').classList.add('open');
+}
+
+function closeInstallModal() {
+  document.getElementById('installModal').classList.remove('open');
+}
+
+function showInstallPlatform(platform) {
+  currentPlatform = platform;
+  ['ios','android','desktop'].forEach(p => {
+    document.getElementById(p + 'Btn').classList.toggle('active', p === platform);
+  });
+  const steps = INSTALL_STEPS[platform];
+  document.getElementById('installSteps').innerHTML = steps.map((s, i) => `
+    <li><div class="step-num">${i+1}</div><div>${s.text}</div></li>
+  `).join('');
+  // Show native install button for Android if prompt available
+  document.getElementById('androidInstallBtn').style.display =
+    (platform === 'android' && deferredPrompt) ? 'block' : 'none';
+}
+
+function triggerAndroidInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      closeInstallModal();
+    });
+  }
+}
 
 // ─── INIT ─────────────────────────────────────────────────────────
 const { username: savedUsername } = getProfile();
