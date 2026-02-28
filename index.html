@@ -960,10 +960,9 @@ function showView(id) {
 
 function cancelAddEdit() {
   if (editingEntry) {
-    // Go back to the detail view of the entry we were editing
-    const idx = allEntries.findIndex(e => e.id === editingEntry.id);
+    const idx = editingEntry._idx;
     editingEntry = null;
-    if (idx !== -1) showEntryDetail(idx);
+    if (idx !== undefined) showEntryDetail(idx);
     else showView('listView');
   } else {
     showView('listView');
@@ -971,9 +970,10 @@ function cancelAddEdit() {
 }
 
 function startEditEntry() {
-  const e = allEntries.find(en => en.id === (window._detailEntryId));
+  const idx = window._detailEntryIdx;
+  const e = allEntries[idx];
   if (!e) return;
-  editingEntry = e;
+  editingEntry = { ...e, _idx: idx }; // keeps id + all fields
 
   // Switch to add view in edit mode
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1120,7 +1120,7 @@ function filterEntries(filter, btn) {
 // ─── DETAIL ───────────────────────────────────────────────────────
 function showEntryDetail(idx) {
   const e = allEntries[idx];
-  window._detailEntryId = e.id; // store for edit button
+  window._detailEntryIdx = idx; // store index for edit button
   const cuisine = e.cuisine || 'Other';
   const photos = getPhotos(e);
 
@@ -1303,7 +1303,9 @@ async function saveEntry() {
 
   const { username } = getProfile();
   const tags = [...document.querySelectorAll('.tag-pick.selected')].map(t => t.textContent).join(', ');
+  const isNew = !editingEntry;
   const row = {
+    id: isNew ? `${Date.now()}_${Math.random().toString(36).slice(2,7)}` : editingEntry.id,
     username,
     name, date,
     cuisine:          document.getElementById('f_cuisine').value,
@@ -1322,8 +1324,8 @@ async function saveEntry() {
   try {
     let res;
     if (editingEntry && editingEntry.id) {
-      // PATCH — update existing row by SheetDB row id
-      res = await fetch(`${API_URL}/id/${editingEntry.id}`, {
+      // PATCH — find the exact row by its unique id column value
+      res = await fetch(`${API_URL}/id/${encodeURIComponent(editingEntry.id)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ data: row })
