@@ -60,9 +60,11 @@
   }
   .add-btn {
     background: var(--ink); color: var(--paper); border: none;
-    width: 36px; height: 36px; border-radius: 50%; font-size: 1.3rem;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
+    height: 36px; border-radius: 2rem; font-size: 0.82rem;
+    font-family: 'Jost', sans-serif; font-weight: 500;
+    padding: 0 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+    transition: background 0.2s; white-space: nowrap;
   }
   .add-btn:hover { background: var(--accent); }
   .back-btn {
@@ -360,14 +362,28 @@
   }
   .custom-tag-btn:hover { background: var(--ink); color: var(--paper); }
 
-  .submit-btn {
+  .price-picker { display: flex; gap: 0.5rem; }
+  .price-btn {
+    flex: 1; padding: 0.55rem 0.5rem; border-radius: 0.6rem;
+    border: 1.5px solid var(--border); background: white;
+    font-family: 'Jost', sans-serif; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; color: var(--ink); transition: all 0.15s;
+    display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+  }
+  .price-btn span { font-size: 0.62rem; font-weight: 400; color: var(--muted); }
+  .price-btn.selected { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .price-btn.selected span { color: rgba(255,255,255,0.6); }
+  .price-btn:hover:not(.selected) { border-color: var(--ink); }
     width: 100%; padding: 1rem; background: var(--ink); color: var(--paper); border: none;
     border-radius: 0.75rem; font-family: 'Jost', sans-serif; font-size: 0.95rem; font-weight: 500;
     cursor: pointer; margin-top: 1.5rem; transition: background 0.2s;
     display: flex; align-items: center; justify-content: center; gap: 0.5rem;
   }
   .submit-btn:hover { background: var(--accent); }
-  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .price-badge {
+    display: inline-block; font-size: 0.7rem; font-weight: 700;
+    color: var(--accent); letter-spacing: 0.5px;
+  }
 
   /* ── PROFILE VIEW ── */
   .profile-hero {
@@ -692,7 +708,7 @@
 <div id="listView" class="view">
   <header>
     <div class="logo"><span class="logo-plate">🍽️</span> Don't Order <em>Wrong</em> <span class="logo-dotcom">dot com</span></div>
-    <button class="add-btn" onclick="showView('addView')" title="Add entry">+</button>
+    <button class="add-btn" onclick="showView('addView')" title="Add entry">＋ New Entry</button>
   </header>
 
   <div class="journal-header">
@@ -718,7 +734,7 @@
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <button class="nav-tab active" onclick="switchTab('listView', this)">
-      <span class="tab-icon">📖</span>Journal
+      <span class="tab-icon">🏠</span>Home
     </button>
     <button class="nav-tab" onclick="showView('addView')">
       <span class="tab-icon">＋</span>Add
@@ -814,6 +830,16 @@
     <div class="field">
       <label>City / Neighbourhood</label>
       <input type="text" id="f_location" placeholder="e.g. Little Italy, Toronto" />
+    </div>
+
+    <div class="field">
+      <label>Price Range</label>
+      <div class="price-picker" id="pricePicker">
+        <button class="price-btn" onclick="selectPrice(this,'$')">$<span>Budget</span></button>
+        <button class="price-btn" onclick="selectPrice(this,'$$')">$$<span>Moderate</span></button>
+        <button class="price-btn" onclick="selectPrice(this,'$$$')">$$$<span>Splurge</span></button>
+      </div>
+      <input type="hidden" id="f_price" value="" />
     </div>
 
     <div class="field">
@@ -949,7 +975,7 @@
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <button class="nav-tab" onclick="switchTab('listView', this)">
-      <span class="tab-icon">📖</span>Journal
+      <span class="tab-icon">🏠</span>Home
     </button>
     <button class="nav-tab" onclick="showView('addView')">
       <span class="tab-icon">＋</span>Add
@@ -1263,6 +1289,13 @@ function startEditEntry() {
   document.getElementById('f_companions').value = e.companions  || '';
   document.getElementById('f_notes').value      = e.notes       || '';
 
+  // Price
+  document.querySelectorAll('.price-btn').forEach(b => {
+    const active = b.getAttribute('onclick').includes(`'${e.price}'`);
+    b.classList.toggle('selected', active);
+  });
+  document.getElementById('f_price').value = e.price || '';
+
   // Cuisine select
   const cuisineSelect = document.getElementById('f_cuisine');
   [...cuisineSelect.options].forEach(o => { o.selected = o.value === e.cuisine; });
@@ -1312,6 +1345,8 @@ function resetForm() {
   ['s_cuisine','s_atmosphere','s_service','s_value'].forEach(id => {
     const el = document.getElementById(id); el.value = 7; el.nextElementSibling.textContent = 7;
   });
+  document.querySelectorAll('.price-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('f_price').value = '';
   document.querySelectorAll('.tag-pick').forEach(t => t.classList.remove('selected'));
   document.querySelectorAll('#tagsPicker .tag-pick.custom').forEach(b => b.remove());
   ['f_name','f_companions','f_notes','f_location'].forEach(id => document.getElementById(id).value = '');
@@ -1347,8 +1382,11 @@ function renderEntries(entries) {
     return;
   }
 
+  // Sort newest first
+  const sorted = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+
   const groups = {};
-  entries.forEach(e => {
+  sorted.forEach(e => {
     const d = new Date(e.date);
     const key = isNaN(d) ? 'Unknown Date' : d.toLocaleString('default', { month:'long', year:'numeric' });
     if (!groups[key]) groups[key] = [];
@@ -1367,6 +1405,7 @@ function renderEntries(entries) {
       const tagHtml = tags.map(t => `<span class="tag-pill ${TAG_CLASS[t.trim()]||'tag-other'}">${t.trim()}</span>`).join('');
       const dateStr = new Date(e.date).toLocaleDateString('en-US', { month:'short', day:'numeric' });
       const companions = e.companions && e.companions !== 'Solo' ? `👥 ${e.companions}` : '';
+      const price = e.price ? `<span class="price-badge">${e.price}</span>` : '';
 
       // Show photo thumbnail if available
       const photos = getPhotos(e);
@@ -1381,6 +1420,7 @@ function renderEntries(entries) {
           <div class="entry-meta">
             <span>📅 ${dateStr}</span>
             ${companions ? `<span>${companions}</span>` : ''}
+            ${price}
           </div>
           <div class="entry-tags">${tagHtml}</div>
         </div>
@@ -1423,7 +1463,7 @@ function showEntryDetail(idx) {
 
   document.getElementById('detailName').textContent = e.name;
   document.getElementById('detailSub').innerHTML =
-    `<span>${cuisine}</span>${e.location ? `<span>📍 ${e.location}</span>` : ''}`;
+    `<span>${cuisine}</span>${e.location ? `<span>📍 ${e.location}</span>` : ''}${e.price ? `<span class="price-badge">${e.price}</span>` : ''}`;
 
   const tags = (e.tags || '').split(',').filter(Boolean);
   document.getElementById('detailTags').innerHTML =
@@ -1596,6 +1636,7 @@ async function saveEntry() {
     cuisine:          document.getElementById('f_cuisine').value,
     location:         document.getElementById('f_location').value.trim(),
     companions:       document.getElementById('f_companions').value.trim() || 'Solo',
+    price:            document.getElementById('f_price').value,
     tags,
     score_cuisine:    document.getElementById('s_cuisine').value,
     score_atmosphere: document.getElementById('s_atmosphere').value,
@@ -1655,6 +1696,11 @@ function getColor(val) {
 }
 function updateSlider(el) { el.nextElementSibling.textContent = el.value; }
 function toggleTag(el)    { el.classList.toggle('selected'); }
+function selectPrice(btn, val) {
+  document.querySelectorAll('.price-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('f_price').value = val;
+}
 function addCustomTag() {
   const input = document.getElementById('customTagInput');
   const val = input.value.trim();
