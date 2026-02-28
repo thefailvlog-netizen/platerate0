@@ -309,8 +309,8 @@
   }
   .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
   .field textarea { resize: vertical; min-height: 80px; }
-  .row2 { display: grid; grid-template-columns: 1fr; gap: 0rem; }
-  @media (min-width: 420px) { .row2 { grid-template-columns: 1fr 1fr; gap: 0.75rem; } }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .row2 .field input, .row2 .field select { min-width: 0; font-size: 0.82rem; padding: 0.6rem 0.6rem; }
 
   /* Photo upload */
   .photo-upload-area {
@@ -1359,7 +1359,6 @@ async function saveEntry() {
     score_atmosphere: document.getElementById('s_atmosphere').value,
     score_service:    document.getElementById('s_service').value,
     score_value:      document.getElementById('s_value').value,
-    score_noise:      document.getElementById('s_noise').value,
     notes:            document.getElementById('f_notes').value.trim(),
     photos:           photoUrls,
   };
