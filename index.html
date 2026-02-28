@@ -378,6 +378,8 @@
   .price-btn.selected { background: var(--ink); color: var(--paper); border-color: var(--ink); }
   .price-btn.selected span { color: rgba(255,255,255,0.6); }
   .price-btn:hover:not(.selected) { border-color: var(--ink); }
+
+  .submit-btn {
     width: 100%; padding: 1rem; background: var(--ink); color: var(--paper); border: none;
     border-radius: 0.75rem; font-family: 'Jost', sans-serif; font-size: 0.95rem; font-weight: 500;
     cursor: pointer; margin-top: 1.5rem; transition: background 0.2s;
@@ -885,29 +887,31 @@
     <div class="slider-group">
       <div class="slider-row">
         <div class="slider-name">🍽️ Cuisine</div>
-        <input type="range" id="s_cuisine" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <input type="range" id="s_cuisine" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
         <div class="slider-val">7</div>
       </div>
       <div class="slider-row">
         <div class="slider-name">🌿 Atmosphere</div>
-        <input type="range" id="s_atmosphere" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <input type="range" id="s_atmosphere" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
         <div class="slider-val">7</div>
       </div>
       <div class="slider-row">
         <div class="slider-name">🤝 Service</div>
-        <input type="range" id="s_service" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <input type="range" id="s_service" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
         <div class="slider-val">7</div>
       </div>
       <div class="slider-row">
         <div class="slider-name">💰 Value</div>
-        <input type="range" id="s_value" min="1" max="10" value="7" oninput="updateSlider(this)">
+        <input type="range" id="s_value" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
         <div class="slider-val">7</div>
       </div>
     </div>
 
     <div class="field">
       <label>Notes & Highlights</label>
-      <textarea id="f_notes" placeholder="What stood out? Any dishes to remember? Would you go back?"></textarea>
+      <textarea id="f_notes" placeholder="What stood out? Any dishes to remember? Would you go back?"
+        oninput="handleNotesInput(this)"></textarea>
+      <div id="notesHint" style="font-size:0.7rem;color:var(--muted);margin-top:0.3rem">✨ Auto-filled from your score — edit freely to override</div>
     </div>
 
     <button class="submit-btn" id="submitBtn" onclick="saveEntry()">Save to Journal ✓</button>
@@ -1292,6 +1296,17 @@ function startEditEntry() {
   document.getElementById('f_location').value   = e.location    || '';
   document.getElementById('f_companions').value = e.companions  || '';
   document.getElementById('f_notes').value      = e.notes       || '';
+  // Detect if the saved note is an auto-verdict or user-written
+  const savedNote = (e.notes || '').trim();
+  const verdicts = [
+    'Exceptional — absolutely worth returning.',
+    'Excellent — highly recommended.',
+    'Great — would go back.',
+    'Good — enjoyable with some caveats.',
+    "Mixed — wouldn't rush back."
+  ];
+  notesUserOverridden = savedNote !== '' && !verdicts.includes(savedNote);
+  document.getElementById('notesHint').style.display = notesUserOverridden ? 'none' : 'block';
 
   // Price
   document.querySelectorAll('.price-btn').forEach(b => {
@@ -1353,7 +1368,10 @@ function resetForm() {
   document.getElementById('f_price').value = '';
   document.querySelectorAll('.tag-pick').forEach(t => t.classList.remove('selected'));
   document.querySelectorAll('#tagsPicker .tag-pick.custom').forEach(b => b.remove());
-  ['f_name','f_companions','f_notes','f_location'].forEach(id => document.getElementById(id).value = '');
+  ['f_name','f_companions','f_location'].forEach(id => document.getElementById(id).value = '');
+  notesUserOverridden = false;
+  document.getElementById('f_notes').value = verdictFromScore(7); // default score is 7
+  document.getElementById('notesHint').style.display = 'block';
   pendingPhotos = [];
   document.getElementById('photoPreviews').innerHTML = '';
   document.getElementById('photoInput').value = '';
@@ -1700,6 +1718,42 @@ function getColor(val) {
 }
 function updateSlider(el) { el.nextElementSibling.textContent = el.value; }
 function toggleTag(el)    { el.classList.toggle('selected'); }
+
+// ─── AUTO NOTE FROM SCORE ──────────────────────────────────────────
+let notesUserOverridden = false;
+
+function calcFormScore() {
+  const ids = ['s_cuisine','s_atmosphere','s_service','s_value'];
+  const vals = ids.map(id => parseFloat(document.getElementById(id)?.value)).filter(v => !isNaN(v));
+  return vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length) : 7;
+}
+
+function verdictFromScore(score) {
+  if (score >= 9)  return 'Exceptional — absolutely worth returning.';
+  if (score >= 8)  return 'Excellent — highly recommended.';
+  if (score >= 7)  return 'Great — would go back.';
+  if (score >= 6)  return 'Good — enjoyable with some caveats.';
+  return 'Mixed — wouldn\'t rush back.';
+}
+
+function updateAutoNote() {
+  if (notesUserOverridden) return;
+  const notes = document.getElementById('f_notes');
+  if (!notes) return;
+  const score = calcFormScore();
+  notes.value = verdictFromScore(score);
+  document.getElementById('notesHint').style.display = 'block';
+}
+
+function handleNotesInput(el) {
+  const autoText = verdictFromScore(calcFormScore());
+  if (el.value.trim() !== autoText.trim()) {
+    notesUserOverridden = true;
+    document.getElementById('notesHint').style.display = 'none';
+  } else {
+    notesUserOverridden = false;
+  }
+}
 function selectPrice(btn, val) {
   document.querySelectorAll('.price-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
@@ -1709,15 +1763,15 @@ function addCustomTag() {
   const input = document.getElementById('customTagInput');
   const val = input.value.trim();
   if (!val) return;
-  // Don't add duplicates
+  // Check against ALL existing tag text, including already-restored custom ones
   const existing = [...document.querySelectorAll('#tagsPicker .tag-pick')]
-    .map(t => t.textContent.toLowerCase());
+    .map(t => t.textContent.trim().toLowerCase());
   if (existing.includes(val.toLowerCase())) {
     input.value = '';
     return;
   }
   const btn = document.createElement('button');
-  btn.className = 'tag-pick selected';
+  btn.className = 'tag-pick selected custom';
   btn.textContent = val;
   btn.onclick = function() { toggleTag(this); };
   document.getElementById('tagsPicker').appendChild(btn);
