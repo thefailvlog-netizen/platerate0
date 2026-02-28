@@ -892,6 +892,7 @@ function resetForm() {
   ['f_name','f_companions','f_notes','f_location'].forEach(id => document.getElementById(id).value = '');
   pendingPhotos = [];
   document.getElementById('photoPreviews').innerHTML = '';
+  document.getElementById('photoInput').value = '';
 }
 
 // ─── LOAD ─────────────────────────────────────────────────────────
@@ -1061,50 +1062,60 @@ function showEntryDetail(idx) {
   showView('detailView');
 }
 
-// ─── PHOTOS ───────────────────────────────────────────────────────
-function getPhotos(entry) {
-  // Photos stored in localStorage keyed by entry name + date
-  const key = `photos_${entry.name}_${entry.date}`;
-  try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; }
-}
+// ─── PHOTOS (Cloudinary) ──────────────────────────────────────────
+const CLOUDINARY_CLOUD = 'drhfdwkzd';
+const CLOUDINARY_PRESET = 'DOWapp1';
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`;
 
-function savePhotos(entry, photos) {
-  const key = `photos_${entry.name}_${entry.date}`;
-  localStorage.setItem(key, JSON.stringify(photos));
+// Photos are now stored as comma-separated URLs in the sheet row (photos column)
+function getPhotos(entry) {
+  if (!entry.photos) return [];
+  return entry.photos.split(',').map(u => u.trim()).filter(Boolean);
 }
 
 function handlePhotoUpload(event) {
   const files = [...event.target.files].slice(0, 5 - pendingPhotos.length);
+  const previewsEl = document.getElementById('photoPreviews');
+
   files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      // Compress image before storing
-      compressImage(e.target.result, 800, 0.7, (compressed) => {
-        pendingPhotos.push(compressed);
-        renderPhotoPreviews();
+    // Show local preview immediately while upload happens in background
+    const localUrl = URL.createObjectURL(file);
+    const idx = pendingPhotos.length;
+    pendingPhotos.push({ file, localUrl, cloudUrl: null, uploading: true });
+    renderPhotoPreviews();
+
+    // Upload to Cloudinary
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+
+    fetch(CLOUDINARY_URL, { method: 'POST', body: formData })
+      .then(r => r.json())
+      .then(data => {
+        const i = pendingPhotos.findIndex(p => p.localUrl === localUrl);
+        if (i !== -1) {
+          pendingPhotos[i].cloudUrl = data.secure_url;
+          pendingPhotos[i].uploading = false;
+          renderPhotoPreviews();
+        }
+      })
+      .catch(() => {
+        const i = pendingPhotos.findIndex(p => p.localUrl === localUrl);
+        if (i !== -1) {
+          pendingPhotos[i].uploading = false;
+          pendingPhotos[i].error = true;
+          renderPhotoPreviews();
+        }
       });
-    };
-    reader.readAsDataURL(file);
   });
 }
 
-function compressImage(dataUrl, maxWidth, quality, callback) {
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    const scale = Math.min(1, maxWidth / img.width);
-    canvas.width = img.width * scale;
-    canvas.height = img.height * scale;
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    callback(canvas.toDataURL('image/jpeg', quality));
-  };
-  img.src = dataUrl;
-}
-
 function renderPhotoPreviews() {
-  document.getElementById('photoPreviews').innerHTML = pendingPhotos.map((src, i) => `
+  document.getElementById('photoPreviews').innerHTML = pendingPhotos.map((p, i) => `
     <div class="preview-wrap">
-      <img class="preview-img" src="${src}" alt="preview" />
+      <img class="preview-img" src="${p.localUrl}" alt="preview" style="opacity:${p.uploading ? 0.5 : 1}" />
+      ${p.uploading ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;background:rgba(0,0,0,0.3);border-radius:0.5rem">⏳</div>` : ''}
+      ${p.error ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;background:rgba(180,0,0,0.5);border-radius:0.5rem">⚠️</div>` : ''}
       <button class="remove-photo" onclick="removePhoto(${i})">✕</button>
     </div>`).join('');
 }
@@ -1128,6 +1139,29 @@ async function saveEntry() {
   const date = document.getElementById('f_date').value;
   if (!name || !date) { alert('Please fill in the restaurant name and date.'); return; }
 
+  const btn = document.getElementById('submitBtn');
+  const status = document.getElementById('saveStatus');
+  btn.disabled = true; status.textContent = '';
+
+  // Wait for any still-uploading photos to finish
+  const stillUploading = pendingPhotos.some(p => p.uploading);
+  if (stillUploading) {
+    btn.textContent = '⏳ Waiting for photos…';
+    await new Promise(resolve => {
+      const interval = setInterval(() => {
+        if (!pendingPhotos.some(p => p.uploading)) { clearInterval(interval); resolve(); }
+      }, 400);
+    });
+  }
+
+  btn.textContent = 'Saving…';
+
+  // Collect successfully uploaded Cloudinary URLs
+  const photoUrls = pendingPhotos
+    .filter(p => p.cloudUrl && !p.error)
+    .map(p => p.cloudUrl)
+    .join(',');
+
   const tags = [...document.querySelectorAll('.tag-pick.selected')].map(t => t.textContent).join(', ');
   const row = {
     name, date,
@@ -1141,17 +1175,8 @@ async function saveEntry() {
     score_value:      document.getElementById('s_value').value,
     score_noise:      document.getElementById('s_noise').value,
     notes:            document.getElementById('f_notes').value.trim(),
+    photos:           photoUrls,
   };
-
-  const btn = document.getElementById('submitBtn');
-  const status = document.getElementById('saveStatus');
-  btn.disabled = true; btn.textContent = 'Saving…'; status.textContent = '';
-
-  if (!API_URL) {
-    if (pendingPhotos.length > 0) savePhotos(row, pendingPhotos);
-    setTimeout(() => { btn.textContent = '✓ Saved!'; setTimeout(() => showView('listView'), 1200); }, 600);
-    return;
-  }
 
   try {
     const res = await fetch(API_URL, {
@@ -1160,10 +1185,8 @@ async function saveEntry() {
       body: JSON.stringify({ data: [row] })
     });
     if (!res.ok) throw new Error();
-    // Save photos locally keyed to this entry
-    if (pendingPhotos.length > 0) savePhotos(row, pendingPhotos);
     btn.textContent = '✓ Saved!';
-    status.textContent = 'Entry added to your Google Sheet.';
+    status.textContent = photoUrls ? '📸 Photos uploaded to cloud!' : 'Entry saved.';
     setTimeout(() => showView('listView'), 1200);
   } catch {
     btn.disabled = false; btn.textContent = 'Save to Journal ✓';
