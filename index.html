@@ -387,6 +387,14 @@ cursor: pointer; margin-top: 1.5rem; transition: background 0.2s;
 display: flex; align-items: center; justify-content: center; gap: 0.5rem;
 }
 .submit-btn:hover { background: var(–accent); }
+.delete-entry-btn {
+width: 100%; padding: 0.8rem; margin-top: 0.75rem;
+background: transparent; border: 1.5px solid #c0392b;
+border-radius: 0.75rem; font-family: ‘Jost’, sans-serif;
+font-size: 0.88rem; color: #c0392b; cursor: pointer;
+transition: all 0.2s;
+}
+.delete-entry-btn:hover { background: #c0392b; color: white; }
 .price-badge {
 display: inline-block; font-size: 0.7rem; font-weight: 700;
 color: var(–accent); letter-spacing: 0.5px;
@@ -928,6 +936,7 @@ display: flex; flex-direction: column; gap: 0.6rem; align-items: center;
 
 <button class="submit-btn" id="submitBtn" onclick="saveEntry()">Save to Journal ✓</button>
 <div id="saveStatus" style="text-align:center;font-size:0.8rem;color:var(--muted);margin-top:0.75rem;min-height:1.2em"></div>
+<button class="delete-entry-btn" id="deleteEntryBtn" style="display:none" onclick="deleteEntry()">🗑 Delete this entry</button>
 ```
 
   </div>
@@ -1314,6 +1323,7 @@ window.scrollTo(0, 0);
 document.getElementById(‘addViewTitle’).textContent  = ‘Edit Entry’;
 document.getElementById(‘addFormHeading’).textContent = ‘Edit your review’;
 document.getElementById(‘submitBtn’).textContent      = ‘Save Changes ✓’;
+document.getElementById(‘deleteEntryBtn’).style.display = ‘block’;
 
 // Pre-fill all fields
 document.getElementById(‘f_name’).value       = e.name        || ‘’;
@@ -1384,6 +1394,7 @@ document.getElementById(‘addViewTitle’).textContent  = ‘New Entry’;
 document.getElementById(‘addFormHeading’).textContent = ‘Where did you eat?’;
 document.getElementById(‘submitBtn’).textContent      = ‘Save to Journal ✓’;
 document.getElementById(‘submitBtn’).disabled         = false;
+document.getElementById(‘deleteEntryBtn’).style.display = ‘none’;
 document.getElementById(‘f_date’).value = new Date().toISOString().split(‘T’)[0];
 document.getElementById(‘saveStatus’).textContent = ‘’;
 [‘s_cuisine’,‘s_atmosphere’,‘s_service’,‘s_value’].forEach(id => {
@@ -1627,6 +1638,40 @@ document.getElementById(‘lightbox’).classList.add(‘open’);
 }
 function closeLightbox() {
 document.getElementById(‘lightbox’).classList.remove(‘open’);
+}
+
+// ─── DELETE ───────────────────────────────────────────────────────
+async function deleteEntry() {
+if (!editingEntry) return;
+const name = editingEntry.name || ‘this entry’;
+if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+const btn = document.getElementById(‘deleteEntryBtn’);
+btn.textContent = ‘Deleting…’;
+btn.disabled = true;
+
+try {
+let res;
+if (editingEntry.id) {
+res = await fetch(`${API_URL}/id/${encodeURIComponent(editingEntry.id)}`, {
+method: ‘DELETE’,
+headers: { ‘Content-Type’: ‘application/json’, ‘Accept’: ‘application/json’ },
+});
+} else {
+const sheetRow = (editingEntry._idx || 0) + 2;
+res = await fetch(`${API_URL}/id/${sheetRow}`, {
+method: ‘DELETE’,
+headers: { ‘Content-Type’: ‘application/json’, ‘Accept’: ‘application/json’ },
+});
+}
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+editingEntry = null;
+showView(‘listView’);
+} catch (err) {
+btn.textContent = ‘🗑 Delete this entry’;
+btn.disabled = false;
+document.getElementById(‘saveStatus’).textContent = `⚠️ Could not delete. ${err.message}`;
+}
 }
 
 // ─── SAVE / UPDATE ────────────────────────────────────────────────
