@@ -506,6 +506,16 @@
   @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Swipe back indicator */
+  .swipe-hint {
+    position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+    width: 4px; height: 60px; background: var(--border);
+    border-radius: 0 4px 4px 0; z-index: 40; pointer-events: none;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  #detailView.active .swipe-hint,
+  #addView.active .swipe-hint { opacity: 1; }
 </style>
 </head>
 <body>
@@ -588,6 +598,7 @@
 
 <!-- ═══════════ DETAIL VIEW ═══════════ -->
 <div id="detailView" class="view">
+  <div class="swipe-hint"></div>
   <header>
     <button class="back-btn" onclick="showView('listView')">← Back</button>
     <div style="font-size:0.75rem;color:var(--muted)" id="detailDate"></div>
@@ -637,6 +648,7 @@
 
 <!-- ═══════════ ADD VIEW ═══════════ -->
 <div id="addView" class="view">
+  <div class="swipe-hint"></div>
   <header>
     <button class="back-btn" id="addBackBtn" onclick="cancelAddEdit()">← Cancel</button>
     <div style="font-size:0.82rem;font-weight:500" id="addViewTitle">New Entry</div>
@@ -1374,6 +1386,51 @@ function getColor(val) {
 }
 function updateSlider(el) { el.nextElementSibling.textContent = el.value; }
 function toggleTag(el)    { el.classList.toggle('selected'); }
+
+// ─── SWIPE GESTURES ───────────────────────────────────────────────
+(function() {
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX    = e.touches[0].clientX;
+    touchStartY    = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    const dx       = e.changedTouches[0].clientX - touchStartX;
+    const dy       = e.changedTouches[0].clientY - touchStartY;
+    const elapsed  = Date.now() - touchStartTime;
+    const absX     = Math.abs(dx);
+    const absY     = Math.abs(dy);
+
+    // Must be: fast enough, mostly horizontal, far enough right-to-left swipe from left edge
+    const isSwipeBack = (
+      elapsed < 350 &&        // quick gesture
+      absX > 60 &&            // moved enough horizontally
+      absX > absY * 2 &&      // more horizontal than vertical
+      dx > 0 &&               // swiping RIGHT (back gesture)
+      touchStartX < 60        // started from left edge (like iOS back)
+    );
+
+    if (!isSwipeBack) return;
+
+    // Figure out which view is active and go back
+    const active = document.querySelector('.view.active');
+    if (!active) return;
+    const id = active.id;
+
+    if (id === 'detailView') {
+      showView('listView');
+    } else if (id === 'addView') {
+      cancelAddEdit();
+    } else if (id === 'profileView') {
+      switchTab('listView', document.querySelector('.nav-tab'));
+    }
+  }, { passive: true });
+})();
 
 // ─── INIT ─────────────────────────────────────────────────────────
 const { username: savedUsername } = getProfile();
