@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <!-- Fonts — load first to prevent layout flash -->
@@ -670,68 +669,63 @@
   .onboard-footer a { font-size: 0.78rem; color: var(--muted); text-decoration: none; }
   .onboard-footer a:hover { color: var(--accent); }
 </style>
-
 </head>
 <body>
 
 <!-- ═══════════ ONBOARDING VIEW ═══════════ -->
-
 <div id="onboardView" class="view">
   <div class="onboard-wrap">
 
-```
-<!-- Floating food emojis -->
-<div class="food-floats" id="foodFloats"></div>
+    <!-- Floating food emojis -->
+    <div class="food-floats" id="foodFloats"></div>
 
-<div class="onboard-logo">🍽️</div>
-<h1 class="onboard-title">Don't Order <em>Wrong</em> <span style="font-size:1rem;font-weight:300;color:var(--muted);font-style:normal;letter-spacing:1px">dot com</span></h1>
-<p class="onboard-sub">Your personal dining journal.<br>Rate restaurants, log memories, share your taste.</p>
-<div class="onboard-form">
+    <div class="onboard-logo">🍽️</div>
+    <h1 class="onboard-title">Don't Order <em>Wrong</em> <span style="font-size:1rem;font-weight:300;color:var(--muted);font-style:normal;letter-spacing:1px">dot com</span></h1>
+    <p class="onboard-sub">Your personal dining journal.<br>Rate restaurants, log memories, share your taste.</p>
+    <div class="onboard-form">
 
-  <!-- Sign up panel -->
-  <div id="ob_signup">
-    <div class="onboard-field">
-      <label>Your Name *</label>
-      <input type="text" id="ob_name" placeholder="e.g. Mike"
-        oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')" autocomplete="given-name"
-        onkeydown="if(event.key==='Enter') completeOnboarding()" />
+      <!-- Sign up panel -->
+      <div id="ob_signup">
+        <div class="onboard-field">
+          <label>Your Name *</label>
+          <input type="text" id="ob_name" placeholder="e.g. Mike"
+            oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')" autocomplete="given-name"
+            onkeydown="if(event.key==='Enter') completeOnboarding()" />
+        </div>
+        <button class="onboard-btn" id="ob_signup_btn" onclick="completeOnboarding()">Login →</button>
+        <p class="onboard-note">No password needed — your name is your key.<br>
+          Already have a journal? <a href="#" onclick="showPanel('ob_login');return false;" style="color:var(--accent)">Sign in →</a></p>
+      </div>
+
+      <!-- Sign in panel -->
+      <div id="ob_login" style="display:none">
+        <div class="onboard-field">
+          <label>Your Name *</label>
+          <input type="text" id="ob_login_user" placeholder="Enter your name"
+            oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')"
+            onkeydown="if(event.key==='Enter') loginWithUsername()" />
+        </div>
+        <button class="onboard-btn" id="ob_login_btn" onclick="loginWithUsername()">Login →</button>
+        <p class="onboard-note"><a href="#" onclick="showPanel('ob_signup');return false;" style="color:var(--accent)">← Create a new journal</a></p>
+      </div>
+
     </div>
-    <button class="onboard-btn" id="ob_signup_btn" onclick="completeOnboarding()">Login →</button>
-    <p class="onboard-note">No password needed — your name is your key.<br>
-      Already have a journal? <a href="#" onclick="showPanel('ob_login');return false;" style="color:var(--accent)">Sign in →</a></p>
-  </div>
 
-  <!-- Sign in panel -->
-  <div id="ob_login" style="display:none">
-    <div class="onboard-field">
-      <label>Your Name *</label>
-      <input type="text" id="ob_login_user" placeholder="Enter your name"
-        oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')"
-        onkeydown="if(event.key==='Enter') loginWithUsername()" />
+    <!-- Footer links -->
+    <div class="onboard-footer">
+      <button class="install-cta" onclick="showInstallModal()">📲 Download the App!</button>
+      <a href="#" onclick="window._changelogFrom='onboardView'; showView('changelogView');return false;">📋 What's New — Read the Changelog</a>
     </div>
-    <button class="onboard-btn" id="ob_login_btn" onclick="loginWithUsername()">Login →</button>
-    <p class="onboard-note"><a href="#" onclick="showPanel('ob_signup');return false;" style="color:var(--accent)">← Create a new journal</a></p>
-  </div>
 
-</div>
-
-<!-- Footer links -->
-<div class="onboard-footer">
-  <button class="install-cta" onclick="showInstallModal()">📲 Download the App!</button>
-  <a href="#" onclick="window._changelogFrom='onboardView'; showView('changelogView');return false;">📋 What's New — Read the Changelog</a>
-</div>
-
-<!-- Built by -->
-<div style="margin-top:2rem;font-size:0.68rem;color:var(--muted);line-height:1.6">
-  Built by <strong>TweetX</strong> using <strong>Claude AI</strong> and the human brain
-</div>
-```
+    <!-- Built by -->
+    <div style="margin-top:2rem;font-size:0.68rem;color:var(--muted);line-height:1.6">
+      Built by <strong>TweetX</strong> using <strong>Claude AI</strong> and the human brain
+    </div>
 
   </div>
 </div>
 
 <!-- ═══════════ LIST VIEW ═══════════ -->
-
 <div id="listView" class="view">
   <header>
     <div class="logo"><span class="logo-plate">🍽️</span> Don't Order <em>Wrong</em> <span class="logo-dotcom">dot com</span></div>
@@ -759,7 +753,6 @@
   </div>
 
   <!-- Bottom Nav -->
-
   <nav class="bottom-nav">
     <button class="nav-tab active" onclick="switchTab('listView', this)">
       <span class="tab-icon">🏠</span>Home
@@ -774,7 +767,6 @@
 </div>
 
 <!-- ═══════════ DETAIL VIEW ═══════════ -->
-
 <div id="detailView" class="view">
   <div class="swipe-hint"></div>
   <header>
@@ -790,45 +782,41 @@
     <div class="detail-sub" id="detailSub"></div>
     <div class="detail-tags" id="detailTags"></div>
 
-```
-<div class="section-title">Overall Score</div>
-<div class="overall-score-block">
-  <div>
-    <div class="big-score" id="detailScore">— <span>/10</span></div>
-    <div class="score-label">Overall Rating</div>
-  </div>
-  <div style="flex:1">
-    <div class="score-breakdown-label" id="detailVerdict"></div>
-  </div>
-</div>
+    <div class="section-title">Overall Score</div>
+    <div class="overall-score-block">
+      <div>
+        <div class="big-score" id="detailScore">— <span>/10</span></div>
+        <div class="score-label">Overall Rating</div>
+      </div>
+      <div style="flex:1">
+        <div class="score-breakdown-label" id="detailVerdict"></div>
+      </div>
+    </div>
 
-<div class="section-title">Breakdown</div>
-<div class="aspects" id="detailAspects"></div>
+    <div class="section-title">Breakdown</div>
+    <div class="aspects" id="detailAspects"></div>
 
-<div class="section-title">Photos</div>
-<div id="detailPhotos"></div>
+    <div class="section-title">Photos</div>
+    <div id="detailPhotos"></div>
 
-<div class="section-title">Location</div>
-<div id="detailMap"></div>
+    <div class="section-title">Location</div>
+    <div id="detailMap"></div>
 
-<div class="section-title">Dined With</div>
-<div class="companions-block" id="detailCompanions"></div>
+    <div class="section-title">Dined With</div>
+    <div class="companions-block" id="detailCompanions"></div>
 
-<div class="section-title">Notes</div>
-<div class="notes-block" id="detailNotes"></div>
+    <div class="section-title">Notes</div>
+    <div class="notes-block" id="detailNotes"></div>
 
-<div class="section-title">Share</div>
-<div class="share-row">
-  <button class="share-btn"><span class="coming-badge">Soon</span>📱 Share to Social</button>
-  <button class="share-btn"><span class="coming-badge">Soon</span>🔗 Send to Friend</button>
-</div>
-```
-
+    <div class="section-title">Share</div>
+    <div class="share-row">
+      <button class="share-btn"><span class="coming-badge">Soon</span>📱 Share to Social</button>
+      <button class="share-btn"><span class="coming-badge">Soon</span>🔗 Send to Friend</button>
+    </div>
   </div>
 </div>
 
 <!-- ═══════════ ADD VIEW ═══════════ -->
-
 <div id="addView" class="view">
   <div class="swipe-hint"></div>
   <header>
@@ -838,120 +826,116 @@
   <div class="form-body">
     <h2 id="addFormHeading">Where did you eat?</h2>
 
-```
-<div class="field">
-  <label>Restaurant Name *</label>
-  <input type="text" id="f_name" placeholder="e.g. Osteria Vecchia" />
-</div>
-<div class="row2">
-  <div class="field">
-    <label>Date Visited *</label>
-    <input type="date" id="f_date" />
-  </div>
-  <div class="field">
-    <label>Cuisine *</label>
-    <select id="f_cuisine">
-      <option>Italian</option>
-      <option>Japanese</option>
-      <option>Mexican</option>
-      <option>French</option>
-      <option>Thai</option>
-      <option>Other</option>
-    </select>
-  </div>
-</div>
+    <div class="field">
+      <label>Restaurant Name *</label>
+      <input type="text" id="f_name" placeholder="e.g. Osteria Vecchia" />
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Date Visited *</label>
+        <input type="date" id="f_date" />
+      </div>
+      <div class="field">
+        <label>Cuisine *</label>
+        <select id="f_cuisine">
+          <option>Italian</option>
+          <option>Japanese</option>
+          <option>Mexican</option>
+          <option>French</option>
+          <option>Thai</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
 
-<div class="field">
-  <label>City / Neighbourhood</label>
-  <input type="text" id="f_location" placeholder="e.g. Little Italy, Toronto" />
-</div>
+    <div class="field">
+      <label>City / Neighbourhood</label>
+      <input type="text" id="f_location" placeholder="e.g. Little Italy, Toronto" />
+    </div>
 
-<div class="field">
-  <label>Price Range</label>
-  <div class="price-picker" id="pricePicker">
-    <button class="price-btn" onclick="selectPrice(this,'$')">$<span>Budget</span></button>
-    <button class="price-btn" onclick="selectPrice(this,'$$')">$$<span>Moderate</span></button>
-    <button class="price-btn" onclick="selectPrice(this,'$$$')">$$$<span>Splurge</span></button>
-  </div>
-  <input type="hidden" id="f_price" value="" />
-</div>
+    <div class="field">
+      <label>Price Range</label>
+      <div class="price-picker" id="pricePicker">
+        <button class="price-btn" onclick="selectPrice(this,'$')">$<span>Budget</span></button>
+        <button class="price-btn" onclick="selectPrice(this,'$$')">$$<span>Moderate</span></button>
+        <button class="price-btn" onclick="selectPrice(this,'$$$')">$$$<span>Splurge</span></button>
+      </div>
+      <input type="hidden" id="f_price" value="" />
+    </div>
 
-<div class="field">
-  <label>Who did you go with?</label>
-  <input type="text" id="f_companions" placeholder="e.g. Sofia, Marco (or Solo)" />
-</div>
+    <div class="field">
+      <label>Who did you go with?</label>
+      <input type="text" id="f_companions" placeholder="e.g. Sofia, Marco (or Solo)" />
+    </div>
 
-<div class="field">
-  <label>Tags</label>
-  <div class="tags-picker" id="tagsPicker">
-    <button class="tag-pick" onclick="toggleTag(this)">Fine Dining</button>
-    <button class="tag-pick" onclick="toggleTag(this)">Casual</button>
-    <button class="tag-pick" onclick="toggleTag(this)">Brunch</button>
-    <button class="tag-pick" onclick="toggleTag(this)">Special Occasion</button>
-    <button class="tag-pick" onclick="toggleTag(this)">Business</button>
-    <button class="tag-pick" onclick="toggleTag(this)">Date Night</button>
-  </div>
-  <div class="custom-tag-row">
-    <input type="text" class="custom-tag-input" id="customTagInput" placeholder="Add your own tag…" maxlength="24"
-      onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTag();}" />
-    <button class="custom-tag-btn" onclick="addCustomTag()">+ Add</button>
-  </div>
-</div>
+    <div class="field">
+      <label>Tags</label>
+      <div class="tags-picker" id="tagsPicker">
+        <button class="tag-pick" onclick="toggleTag(this)">Fine Dining</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Casual</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Brunch</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Special Occasion</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Business</button>
+        <button class="tag-pick" onclick="toggleTag(this)">Date Night</button>
+      </div>
+      <div class="custom-tag-row">
+        <input type="text" class="custom-tag-input" id="customTagInput" placeholder="Add your own tag…" maxlength="24"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTag();}" />
+        <button class="custom-tag-btn" onclick="addCustomTag()">+ Add</button>
+      </div>
+    </div>
 
-<!-- Photo upload -->
-<div class="field">
-  <label>Photos</label>
-  <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
-    <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoUpload(event)" />
-    <div class="upload-icon">📷</div>
-    <div class="upload-label"><strong>Tap to add photos</strong><br>JPG, PNG — up to 5 photos</div>
-  </div>
-  <div class="photo-previews" id="photoPreviews"></div>
-</div>
+    <!-- Photo upload -->
+    <div class="field">
+      <label>Photos</label>
+      <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
+        <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoUpload(event)" />
+        <div class="upload-icon">📷</div>
+        <div class="upload-label"><strong>Tap to add photos</strong><br>JPG, PNG — up to 5 photos</div>
+      </div>
+      <div class="photo-previews" id="photoPreviews"></div>
+    </div>
 
-<div class="field" style="margin-top:1.5rem">
-  <label>Rate Each Aspect (out of 10)</label>
-</div>
-<div class="slider-group">
-  <div class="slider-row">
-    <div class="slider-name">🍽️ Cuisine</div>
-    <input type="range" id="s_cuisine" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
-    <div class="slider-val">7</div>
-  </div>
-  <div class="slider-row">
-    <div class="slider-name">🌿 Atmosphere</div>
-    <input type="range" id="s_atmosphere" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
-    <div class="slider-val">7</div>
-  </div>
-  <div class="slider-row">
-    <div class="slider-name">🤝 Service</div>
-    <input type="range" id="s_service" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
-    <div class="slider-val">7</div>
-  </div>
-  <div class="slider-row">
-    <div class="slider-name">💰 Value</div>
-    <input type="range" id="s_value" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
-    <div class="slider-val">7</div>
-  </div>
-</div>
+    <div class="field" style="margin-top:1.5rem">
+      <label>Rate Each Aspect (out of 10)</label>
+    </div>
+    <div class="slider-group">
+      <div class="slider-row">
+        <div class="slider-name">🍽️ Cuisine</div>
+        <input type="range" id="s_cuisine" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
+        <div class="slider-val">7</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-name">🌿 Atmosphere</div>
+        <input type="range" id="s_atmosphere" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
+        <div class="slider-val">7</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-name">🤝 Service</div>
+        <input type="range" id="s_service" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
+        <div class="slider-val">7</div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-name">💰 Value</div>
+        <input type="range" id="s_value" min="1" max="10" value="7" oninput="updateSlider(this);updateAutoNote()">
+        <div class="slider-val">7</div>
+      </div>
+    </div>
 
-<div class="field">
-  <label>Notes & Highlights</label>
-  <textarea id="f_notes" placeholder="What stood out? Any dishes to remember? Would you go back?"
-    oninput="handleNotesInput(this)"></textarea>
-  <div id="notesHint" style="font-size:0.7rem;color:var(--muted);margin-top:0.3rem">✨ Auto-filled from your score — edit freely to override</div>
-</div>
+    <div class="field">
+      <label>Notes & Highlights</label>
+      <textarea id="f_notes" placeholder="What stood out? Any dishes to remember? Would you go back?"
+        oninput="handleNotesInput(this)"></textarea>
+      <div id="notesHint" style="font-size:0.7rem;color:var(--muted);margin-top:0.3rem">✨ Auto-filled from your score — edit freely to override</div>
+    </div>
 
-<button class="submit-btn" id="submitBtn" onclick="saveEntry()">Save to Journal ✓</button>
-<div id="saveStatus" style="text-align:center;font-size:0.8rem;color:var(--muted);margin-top:0.75rem;min-height:1.2em"></div>
-<button class="delete-entry-btn" id="deleteEntryBtn" style="display:none" onclick="deleteEntry()">🗑 Delete this entry</button>
-```
-
+    <button class="submit-btn" id="submitBtn" onclick="saveEntry()">Save to Journal ✓</button>
+    <div id="saveStatus" style="text-align:center;font-size:0.8rem;color:var(--muted);margin-top:0.75rem;min-height:1.2em"></div>
+    <button class="delete-entry-btn" id="deleteEntryBtn" style="display:none" onclick="deleteEntry()">🗑 Delete this entry</button>
   </div>
 </div>
 
 <!-- ═══════════ PROFILE VIEW ═══════════ -->
-
 <div id="profileView" class="view">
   <header>
     <div class="logo"><span class="logo-plate">🍽️</span> Don't Order <em>Wrong</em> <span class="logo-dotcom">dot com</span></div>
@@ -992,31 +976,27 @@
     </div>
     <button class="profile-save-btn" onclick="saveProfile()">Save Changes ✓</button>
 
-```
-<div class="profile-section-title">Account</div>
-<div class="profile-menu">
-  <div class="menu-row" onclick="switchUser()">
-    🔀 Switch / Visit Another Journal <span>→</span>
-  </div>
-  <div class="menu-row" onclick="showInstallModal()">
-    📲 Download the App! <span>Add to Home Screen →</span>
-  </div>
-  <div class="menu-row" onclick="window.location.href='mailto:thefailvlog@gmail.com?subject=Comments%20on%20the%20DOW%20App'">
-    💌 Suggestion Box <span>Email the developer →</span>
-  </div>
-  <div class="menu-row" onclick="window._changelogFrom='profileView'; showView('changelogView')">
-    📋 What's New <span>Read the Changelog →</span>
-  </div>
-  <div class="menu-row" onclick="if(confirm('Log out? You can sign back in with your username anytime.')) { localStorage.removeItem('profile_username'); localStorage.removeItem('profile_name'); location.reload(); }">
-    🚪 Log Out <span>→</span>
-  </div>
-</div>
-```
-
+    <div class="profile-section-title">Account</div>
+    <div class="profile-menu">
+      <div class="menu-row" onclick="switchUser()">
+        🔀 Switch / Visit Another Journal <span>→</span>
+      </div>
+      <div class="menu-row" onclick="showInstallModal()">
+        📲 Download the App! <span>Add to Home Screen →</span>
+      </div>
+      <div class="menu-row" onclick="window.location.href='mailto:thefailvlog@gmail.com?subject=Comments%20on%20the%20DOW%20App'">
+        💌 Suggestion Box <span>Email the developer →</span>
+      </div>
+      <div class="menu-row" onclick="window._changelogFrom='profileView'; showView('changelogView')">
+        📋 What's New <span>Read the Changelog →</span>
+      </div>
+      <div class="menu-row" onclick="if(confirm('Log out? You can sign back in with your username anytime.')) { localStorage.removeItem('profile_username'); localStorage.removeItem('profile_name'); location.reload(); }">
+        🚪 Log Out <span>→</span>
+      </div>
+    </div>
   </div>
 
   <!-- Bottom Nav -->
-
   <nav class="bottom-nav">
     <button class="nav-tab" onclick="switchTab('listView', this)">
       <span class="tab-icon">🏠</span>Home
@@ -1030,8 +1010,8 @@
   </nav>
 </div>
 
-<!-- ═══════════ CHANGELOG VIEW ═══════════ -->
 
+<!-- ═══════════ CHANGELOG VIEW ═══════════ -->
 <div id="changelogView" class="view">
   <header>
     <button class="back-btn" onclick="showView(window._changelogFrom || 'onboardView')">← Back</button>
@@ -1042,97 +1022,94 @@
     <h2>Changelog</h2>
     <p class="cl-sub">Every update to Don't Order Wrong, newest first.</p>
 
-```
-<div class="cl-release">
-  <div class="cl-release-header">
-    <span class="cl-version">v0.9</span>
-    <span class="cl-badge">LATEST</span>
-    <span class="cl-date">March 2025</span>
-  </div>
-  <ul class="cl-items">
-    <li>Added Edit Entry — update notes, scores, photos and more on any existing entry</li>
-    <li>Unique row IDs added for reliable edit/update targeting in the database</li>
-    <li>Custom tags — type and add your own tags beyond the preset list</li>
-    <li>Removed Noise Level from aspect scoring (now: Cuisine, Atmosphere, Service, Value)</li>
-    <li>Date and Cuisine fields fixed to sit side-by-side cleanly on mobile</li>
-    <li>Download the App button — install DOW as a home screen icon on any device</li>
-    <li>Changelog page added (you're looking at it!)</li>
-    <li>Swipe right from left edge to go back on any screen</li>
-    <li>Suggestion Box added to profile — email the developer directly</li>
-  </ul>
-</div>
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.9</span>
+        <span class="cl-badge">LATEST</span>
+        <span class="cl-date">March 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>Added Edit Entry — update notes, scores, photos and more on any existing entry</li>
+        <li>Unique row IDs added for reliable edit/update targeting in the database</li>
+        <li>Custom tags — type and add your own tags beyond the preset list</li>
+        <li>Removed Noise Level from aspect scoring (now: Cuisine, Atmosphere, Service, Value)</li>
+        <li>Date and Cuisine fields fixed to sit side-by-side cleanly on mobile</li>
+        <li>Download the App button — install DOW as a home screen icon on any device</li>
+        <li>Changelog page added (you're looking at it!)</li>
+        <li>Swipe right from left edge to go back on any screen</li>
+        <li>Suggestion Box added to profile — email the developer directly</li>
+      </ul>
+    </div>
 
-<div class="cl-release">
-  <div class="cl-release-header">
-    <span class="cl-version">v0.8</span>
-    <span class="cl-date">February 2025</span>
-  </div>
-  <ul class="cl-items">
-    <li>Username accounts — each person gets their own private journal</li>
-    <li>Sign up and sign in with just your name, no password needed</li>
-    <li>Switch Journal — visit another user's journal by entering their name</li>
-    <li>Entries now tagged with username so journals stay separate</li>
-  </ul>
-</div>
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.8</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>Username accounts — each person gets their own private journal</li>
+        <li>Sign up and sign in with just your name, no password needed</li>
+        <li>Switch Journal — visit another user's journal by entering their name</li>
+        <li>Entries now tagged with username so journals stay separate</li>
+      </ul>
+    </div>
 
-<div class="cl-release">
-  <div class="cl-release-header">
-    <span class="cl-version">v0.7</span>
-    <span class="cl-date">February 2025</span>
-  </div>
-  <ul class="cl-items">
-    <li>PWA support — app can be installed on iPhone and Android home screens</li>
-    <li>DOW icon designed and added across all icon sizes</li>
-    <li>Service worker added for offline support and instant loading</li>
-  </ul>
-</div>
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.7</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>PWA support — app can be installed on iPhone and Android home screens</li>
+        <li>DOW icon designed and added across all icon sizes</li>
+        <li>Service worker added for offline support and instant loading</li>
+      </ul>
+    </div>
 
-<div class="cl-release">
-  <div class="cl-release-header">
-    <span class="cl-version">v0.6</span>
-    <span class="cl-date">February 2025</span>
-  </div>
-  <ul class="cl-items">
-    <li>Photo uploads via Cloudinary — photos now sync across all devices</li>
-    <li>Photo gallery in entry detail view with lightbox tap-to-expand</li>
-    <li>Custom domain live at dontorderwrong.com</li>
-  </ul>
-</div>
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.6</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>Photo uploads via Cloudinary — photos now sync across all devices</li>
+        <li>Photo gallery in entry detail view with lightbox tap-to-expand</li>
+        <li>Custom domain live at dontorderwrong.com</li>
+      </ul>
+    </div>
 
-<div class="cl-release">
-  <div class="cl-release-header">
-    <span class="cl-version">v0.5</span>
-    <span class="cl-date">February 2025</span>
-  </div>
-  <ul class="cl-items">
-    <li>App renamed to Don't Order Wrong dot com</li>
-    <li>Bebas Neue logo typeface added</li>
-    <li>Google Maps integration — each entry links to restaurant location</li>
-    <li>Profile tab with dining stats (visits, average score, top cuisine)</li>
-    <li>Bottom navigation bar added</li>
-  </ul>
-</div>
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.5</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>App renamed to Don't Order Wrong dot com</li>
+        <li>Bebas Neue logo typeface added</li>
+        <li>Google Maps integration — each entry links to restaurant location</li>
+        <li>Profile tab with dining stats (visits, average score, top cuisine)</li>
+        <li>Bottom navigation bar added</li>
+      </ul>
+    </div>
 
-<div class="cl-release">
-  <div class="cl-release-header">
-    <span class="cl-version">v0.1 – v0.4</span>
-    <span class="cl-date">February 2025</span>
-  </div>
-  <ul class="cl-items">
-    <li>Initial concept and prototype built</li>
-    <li>Google Sheets + SheetDB backend integration</li>
-    <li>10-point rating system with aspect breakdowns</li>
-    <li>Tag system, companion tracking, notes field</li>
-    <li>Deployed to GitHub Pages</li>
-  </ul>
-</div>
-```
+    <div class="cl-release">
+      <div class="cl-release-header">
+        <span class="cl-version">v0.1 – v0.4</span>
+        <span class="cl-date">February 2025</span>
+      </div>
+      <ul class="cl-items">
+        <li>Initial concept and prototype built</li>
+        <li>Google Sheets + SheetDB backend integration</li>
+        <li>10-point rating system with aspect breakdowns</li>
+        <li>Tag system, companion tracking, notes field</li>
+        <li>Deployed to GitHub Pages</li>
+      </ul>
+    </div>
 
   </div>
 </div>
 
 <!-- ═══════════ INSTALL MODAL ═══════════ -->
-
 <div class="modal-overlay" id="installModal" onclick="if(event.target===this)closeInstallModal()">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
@@ -1152,7 +1129,6 @@
 </div>
 
 <!-- Install banner (Android/desktop) -->
-
 <div class="install-banner" id="installBanner">
   <div class="install-banner-icon">🍽️</div>
   <div class="install-banner-text">
@@ -1164,31 +1140,29 @@
 </div>
 
 <!-- Lightbox -->
-
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <img id="lightboxImg" src="" alt="" />
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-
 // ─── CONFIG ───────────────────────────────────────────────────────
-const API_URL = ‘https://sheetdb.io/api/v1/2xz775fy5o3we’;
+const API_URL = 'https://sheetdb.io/api/v1/2xz775fy5o3we';
 
-const CUISINE_EMOJIS = { Italian:‘🍝’, Japanese:‘🍣’, Mexican:‘🌮’, French:‘🥐’, Thai:‘🍜’, Other:‘🍴’ };
+const CUISINE_EMOJIS = { Italian:'🍝', Japanese:'🍣', Mexican:'🌮', French:'🥐', Thai:'🍜', Other:'🍴' };
 const CUISINE_BG     = {
-Italian:‘linear-gradient(135deg,#C4522A,#D4A853)’,
-Japanese:‘linear-gradient(135deg,#1C4A6B,#7BAFC8)’,
-Mexican:‘linear-gradient(135deg,#9B7020,#E8B84B)’,
-French:‘linear-gradient(135deg,#6040A0,#C0A0E0)’,
-Thai:‘linear-gradient(135deg,#206040,#80C0A0)’,
-Other:‘linear-gradient(135deg,#555,#999)’
+  Italian:'linear-gradient(135deg,#C4522A,#D4A853)',
+  Japanese:'linear-gradient(135deg,#1C4A6B,#7BAFC8)',
+  Mexican:'linear-gradient(135deg,#9B7020,#E8B84B)',
+  French:'linear-gradient(135deg,#6040A0,#C0A0E0)',
+  Thai:'linear-gradient(135deg,#206040,#80C0A0)',
+  Other:'linear-gradient(135deg,#555,#999)'
 };
-const CUISINE_EMOJI_BG = { Italian:’#FDE8D8’, Japanese:’#D8EBF5’, Mexican:’#FDF3D8’, French:’#E8D8F5’, Thai:’#D8F5E8’, Other:’#EEE’ };
+const CUISINE_EMOJI_BG = { Italian:'#FDE8D8', Japanese:'#D8EBF5', Mexican:'#FDF3D8', French:'#E8D8F5', Thai:'#D8F5E8', Other:'#EEE' };
 const TAG_CLASS = {
-‘Italian’:‘tag-italian’,‘Japanese’:‘tag-japanese’,‘Mexican’:‘tag-mexican’,‘French’:‘tag-french’,
-‘Thai’:‘tag-thai’,‘Casual’:‘tag-casual’,‘Fine Dining’:‘tag-finedining’,‘Brunch’:‘tag-brunch’,
-‘Other’:‘tag-other’,‘Special Occasion’:‘tag-finedining’,‘Business’:‘tag-other’,‘Date Night’:‘tag-brunch’
+  'Italian':'tag-italian','Japanese':'tag-japanese','Mexican':'tag-mexican','French':'tag-french',
+  'Thai':'tag-thai','Casual':'tag-casual','Fine Dining':'tag-finedining','Brunch':'tag-brunch',
+  'Other':'tag-other','Special Occasion':'tag-finedining','Business':'tag-other','Date Night':'tag-brunch'
 };
 
 let allEntries = [];
@@ -1197,791 +1171,808 @@ let editingEntry = null; // holds the entry being edited, or null for new
 
 // ─── PROFILE / ONBOARDING ─────────────────────────────────────────
 function getProfile() {
-return {
-username: localStorage.getItem(‘profile_username’) || ‘’,
-name:     localStorage.getItem(‘profile_name’)     || ‘’,
-};
+  return {
+    username: localStorage.getItem('profile_username') || '',
+    name:     localStorage.getItem('profile_name')     || '',
+  };
 }
 
 function showPanel(id) {
-document.getElementById(‘ob_signup’).style.display = id === ‘ob_signup’ ? ‘block’ : ‘none’;
-document.getElementById(‘ob_login’).style.display  = id === ‘ob_login’  ? ‘block’ : ‘none’;
+  document.getElementById('ob_signup').style.display = id === 'ob_signup' ? 'block' : 'none';
+  document.getElementById('ob_login').style.display  = id === 'ob_login'  ? 'block' : 'none';
 }
 
 function completeOnboarding() {
-const name = document.getElementById(‘ob_name’).value.trim();
-if (!name || name.length < 2) { alert(‘Please enter your name (min 2 characters).’); return; }
-const username = name.toLowerCase().replace(/\s+/g, ‘_’);
-localStorage.setItem(‘profile_username’, username);
-localStorage.setItem(‘profile_name’, name);
-showMainApp();
+  const name = document.getElementById('ob_name').value.trim();
+  if (!name || name.length < 2) { alert('Please enter your name (min 2 characters).'); return; }
+  const username = name.toLowerCase().replace(/\s+/g, '_');
+  localStorage.setItem('profile_username', username);
+  localStorage.setItem('profile_name', name);
+  showMainApp();
 }
 
 function loginWithUsername() {
-const name = document.getElementById(‘ob_login_user’).value.trim();
-if (!name) { alert(‘Please enter your name.’); return; }
-const username = name.toLowerCase().replace(/\s+/g, ‘_’);
-localStorage.setItem(‘profile_username’, username);
-localStorage.setItem(‘profile_name’, name);
-showMainApp();
+  const name = document.getElementById('ob_login_user').value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+  const username = name.toLowerCase().replace(/\s+/g, '_');
+  localStorage.setItem('profile_username', username);
+  localStorage.setItem('profile_name', name);
+  showMainApp();
 }
 
 function switchUser() {
-const name = prompt(‘Enter a name to switch to:’);
-if (!name || !name.trim()) return;
-const clean = name.trim();
-const username = clean.toLowerCase().replace(/\s+/g, ‘_’);
-localStorage.setItem(‘profile_username’, username);
-localStorage.setItem(‘profile_name’, clean);
-showMainApp();
+  const name = prompt('Enter a name to switch to:');
+  if (!name || !name.trim()) return;
+  const clean = name.trim();
+  const username = clean.toLowerCase().replace(/\s+/g, '_');
+  localStorage.setItem('profile_username', username);
+  localStorage.setItem('profile_name', clean);
+  showMainApp();
 }
 
 function showMainApp() {
-updateJournalTitle();
-showView(‘listView’);
+  updateJournalTitle();
+  showView('listView');
 }
 
 function updateJournalTitle() {
-const { name, username } = getProfile();
-const titleEl = document.getElementById(‘journalTitle’);
-if (!titleEl) return;
-const display = name || username;
-titleEl.textContent = display ? `${display}'s Journal` : “Don’t Order Wrong”;
+  const { name, username } = getProfile();
+  const titleEl = document.getElementById('journalTitle');
+  if (!titleEl) return;
+  const display = name || username;
+  titleEl.textContent = display ? `${display}'s Journal` : "Don't Order Wrong";
 }
 
 function saveProfile() {
-const name = document.getElementById(‘p_name’).value.trim();
-if (!name) { alert(‘Please enter your display name.’); return; }
-localStorage.setItem(‘profile_name’, name);
-refreshProfileView();
-updateJournalTitle();
-alert(‘✓ Profile saved!’);
+  const name = document.getElementById('p_name').value.trim();
+  if (!name) { alert('Please enter your display name.'); return; }
+  localStorage.setItem('profile_name', name);
+  refreshProfileView();
+  updateJournalTitle();
+  alert('✓ Profile saved!');
 }
 
 function refreshProfileView() {
-const { name, username } = getProfile();
-document.getElementById(‘profileAvatar’).textContent       = (name || username || ‘?’)[0].toUpperCase();
-document.getElementById(‘profileNameDisplay’).textContent  = name || username || ‘Your Name’;
-document.getElementById(‘profileEmailDisplay’).textContent = username ? `@${username}` : ‘@username’;
-document.getElementById(‘p_name’).value     = name;
-document.getElementById(‘p_username’).value = username;
+  const { name, username } = getProfile();
+  document.getElementById('profileAvatar').textContent       = (name || username || '?')[0].toUpperCase();
+  document.getElementById('profileNameDisplay').textContent  = name || username || 'Your Name';
+  document.getElementById('profileEmailDisplay').textContent = username ? `@${username}` : '@username';
+  document.getElementById('p_name').value     = name;
+  document.getElementById('p_username').value = username;
 
-const visits = allEntries.length;
-document.getElementById(‘statVisits’).textContent = visits;
-if (visits > 0) {
-const scores = allEntries.map(e => parseFloat(calcOverall(e))).filter(v => !isNaN(v));
-const avg = scores.length ? (scores.reduce((a,b) => a+b,0)/scores.length).toFixed(1) : ‘—’;
-document.getElementById(‘statAvg’).textContent = avg;
-const cuisineCount = {};
-allEntries.forEach(e => { if (e.cuisine) cuisineCount[e.cuisine] = (cuisineCount[e.cuisine]||0)+1; });
-const top = Object.entries(cuisineCount).sort((a,b) => b[1]-a[1])[0];
-document.getElementById(‘statTop’).textContent = top ? top[0].slice(0,3) : ‘—’;
-}
+  const visits = allEntries.length;
+  document.getElementById('statVisits').textContent = visits;
+  if (visits > 0) {
+    const scores = allEntries.map(e => parseFloat(calcOverall(e))).filter(v => !isNaN(v));
+    const avg = scores.length ? (scores.reduce((a,b) => a+b,0)/scores.length).toFixed(1) : '—';
+    document.getElementById('statAvg').textContent = avg;
+    const cuisineCount = {};
+    allEntries.forEach(e => { if (e.cuisine) cuisineCount[e.cuisine] = (cuisineCount[e.cuisine]||0)+1; });
+    const top = Object.entries(cuisineCount).sort((a,b) => b[1]-a[1])[0];
+    document.getElementById('statTop').textContent = top ? top[0].slice(0,3) : '—';
+  }
 }
 
 function switchTab(viewId, btn) {
-// Update all bottom nav tabs
-document.querySelectorAll(’.nav-tab’).forEach(t => t.classList.remove(‘active’));
-document.querySelectorAll(’.bottom-nav .nav-tab’).forEach(t => {
-if (t.textContent.includes(btn.textContent.trim().split(’\n’).pop().trim())) t.classList.add(‘active’);
-});
-btn.classList.add(‘active’);
-if (viewId === ‘profileView’) {
-document.querySelectorAll(’.view’).forEach(v => v.classList.remove(‘active’));
-document.getElementById(‘profileView’).classList.add(‘active’);
-window.scrollTo(0,0);
-refreshProfileView();
-} else {
-showView(viewId);
-}
+  // Update all bottom nav tabs
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.bottom-nav .nav-tab').forEach(t => {
+    if (t.textContent.includes(btn.textContent.trim().split('\n').pop().trim())) t.classList.add('active');
+  });
+  btn.classList.add('active');
+  if (viewId === 'profileView') {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('profileView').classList.add('active');
+    window.scrollTo(0,0);
+    refreshProfileView();
+  } else {
+    showView(viewId);
+  }
 }
 
 // ─── VIEWS ────────────────────────────────────────────────────────
 function showView(id) {
-document.querySelectorAll(’.view’).forEach(v => v.classList.remove(‘active’));
-document.getElementById(id).classList.add(‘active’);
-window.scrollTo(0, 0);
-if (id === ‘listView’)     { updateJournalTitle(); loadEntries(); }
-if (id === ‘addView’)      resetForm();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'listView')     { updateJournalTitle(); loadEntries(); }
+  if (id === 'addView')      resetForm();
 }
 
 function cancelAddEdit() {
-if (editingEntry) {
-const idx = editingEntry._idx;
-editingEntry = null;
-if (idx !== undefined) showEntryDetail(idx);
-else showView(‘listView’);
-} else {
-showView(‘listView’);
-}
+  if (editingEntry) {
+    const idx = editingEntry._idx;
+    editingEntry = null;
+    if (idx !== undefined) showEntryDetail(idx);
+    else showView('listView');
+  } else {
+    showView('listView');
+  }
 }
 
 function startEditEntry() {
-const idx = window._detailEntryIdx;
-const e = allEntries[idx];
-if (!e) return;
-editingEntry = { …e, _idx: idx }; // keeps id + all fields
+  const idx = window._detailEntryIdx;
+  const e = allEntries[idx];
+  if (!e) return;
+  editingEntry = { ...e, _idx: idx }; // keeps id + all fields
 
-// Switch to add view in edit mode
-document.querySelectorAll(’.view’).forEach(v => v.classList.remove(‘active’));
-document.getElementById(‘addView’).classList.add(‘active’);
-window.scrollTo(0, 0);
+  // Switch to add view in edit mode
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('addView').classList.add('active');
+  window.scrollTo(0, 0);
 
-// Update headings
-document.getElementById(‘addViewTitle’).textContent  = ‘Edit Entry’;
-document.getElementById(‘addFormHeading’).textContent = ‘Edit your review’;
-document.getElementById(‘submitBtn’).textContent      = ‘Save Changes ✓’;
-document.getElementById(‘deleteEntryBtn’).style.display = ‘block’;
+  // Update headings
+  document.getElementById('addViewTitle').textContent  = 'Edit Entry';
+  document.getElementById('addFormHeading').textContent = 'Edit your review';
+  document.getElementById('submitBtn').textContent      = 'Save Changes ✓';
+  document.getElementById('deleteEntryBtn').style.display = 'block';
 
-// Pre-fill all fields
-document.getElementById(‘f_name’).value       = e.name        || ‘’;
-document.getElementById(‘f_date’).value       = e.date        || ‘’;
-document.getElementById(‘f_location’).value   = e.location    || ‘’;
-document.getElementById(‘f_companions’).value = e.companions  || ‘’;
-document.getElementById(‘f_notes’).value      = e.notes       || ‘’;
-// Detect if the saved note is an auto-verdict or user-written
-const savedNote = (e.notes || ‘’).trim();
-const verdicts = [
-‘Exceptional — absolutely worth returning.’,
-‘Excellent — highly recommended.’,
-‘Great — would go back.’,
-‘Good — enjoyable with some caveats.’,
-“Mixed — wouldn’t rush back.”
-];
-notesUserOverridden = savedNote !== ‘’ && !verdicts.includes(savedNote);
-document.getElementById(‘notesHint’).style.display = notesUserOverridden ? ‘none’ : ‘block’;
+  // Pre-fill all fields
+  document.getElementById('f_name').value       = e.name        || '';
+  document.getElementById('f_date').value       = e.date        || '';
+  document.getElementById('f_location').value   = e.location    || '';
+  document.getElementById('f_companions').value = e.companions  || '';
+  document.getElementById('f_notes').value      = e.notes       || '';
+  // Detect if the saved note is an auto-verdict or user-written
+  const savedNote = (e.notes || '').trim();
+  const verdicts = [
+    'Exceptional — absolutely worth returning.',
+    'Excellent — highly recommended.',
+    'Great — would go back.',
+    'Good — enjoyable with some caveats.',
+    "Mixed — wouldn't rush back."
+  ];
+  notesUserOverridden = savedNote !== '' && !verdicts.includes(savedNote);
+  document.getElementById('notesHint').style.display = notesUserOverridden ? 'none' : 'block';
 
-// Price
-document.querySelectorAll(’.price-btn’).forEach(b => {
-const active = b.getAttribute(‘onclick’).includes(`'${e.price}'`);
-b.classList.toggle(‘selected’, active);
-});
-document.getElementById(‘f_price’).value = e.price || ‘’;
+  // Price
+  document.querySelectorAll('.price-btn').forEach(b => {
+    const active = b.getAttribute('onclick').includes(`'${e.price}'`);
+    b.classList.toggle('selected', active);
+  });
+  document.getElementById('f_price').value = e.price || '';
 
-// Cuisine select
-const cuisineSelect = document.getElementById(‘f_cuisine’);
-[…cuisineSelect.options].forEach(o => { o.selected = o.value === e.cuisine; });
+  // Cuisine select
+  const cuisineSelect = document.getElementById('f_cuisine');
+  [...cuisineSelect.options].forEach(o => { o.selected = o.value === e.cuisine; });
 
-// Sliders
-[[‘s_cuisine’,‘score_cuisine’],[‘s_atmosphere’,‘score_atmosphere’],[‘s_service’,‘score_service’],
-[‘s_value’,‘score_value’]].forEach(([sid, key]) => {
-const el = document.getElementById(sid);
-el.value = parseFloat(e[key]) || 7;
-el.nextElementSibling.textContent = el.value;
-});
+  // Sliders
+  [['s_cuisine','score_cuisine'],['s_atmosphere','score_atmosphere'],['s_service','score_service'],
+   ['s_value','score_value']].forEach(([sid, key]) => {
+    const el = document.getElementById(sid);
+    el.value = parseFloat(e[key]) || 7;
+    el.nextElementSibling.textContent = el.value;
+  });
 
-// Tags — restore preset selections and re-create any custom tags
-const entryTags = (e.tags || ‘’).split(’,’).map(t => t.trim()).filter(Boolean);
-const defaultTags = [‘Fine Dining’,‘Casual’,‘Brunch’,‘Special Occasion’,‘Business’,‘Date Night’];
-// Reset all presets first
-document.querySelectorAll(’#tagsPicker .tag-pick’).forEach(btn => {
-btn.classList.toggle(‘selected’, entryTags.some(t => t.toLowerCase() === btn.textContent.trim().toLowerCase()));
-});
-// Remove any previously added custom tags
-document.querySelectorAll(’#tagsPicker .tag-pick.custom’).forEach(b => b.remove());
-// Add back custom tags from this entry
-entryTags.forEach(t => {
-if (!defaultTags.some(d => d.toLowerCase() === t.toLowerCase())) {
-const btn = document.createElement(‘button’);
-btn.className = ‘tag-pick selected custom’;
-btn.textContent = t;
-btn.onclick = function() { toggleTag(this); };
-document.getElementById(‘tagsPicker’).appendChild(btn);
-}
-});
+  // Tags — restore preset selections and re-create any custom tags
+  const entryTags = (e.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+  const defaultTags = ['Fine Dining','Casual','Brunch','Special Occasion','Business','Date Night'];
+  // Reset all presets first
+  document.querySelectorAll('#tagsPicker .tag-pick').forEach(btn => {
+    btn.classList.toggle('selected', entryTags.some(t => t.toLowerCase() === btn.textContent.trim().toLowerCase()));
+  });
+  // Remove any previously added custom tags
+  document.querySelectorAll('#tagsPicker .tag-pick.custom').forEach(b => b.remove());
+  // Add back custom tags from this entry
+  entryTags.forEach(t => {
+    if (!defaultTags.some(d => d.toLowerCase() === t.toLowerCase())) {
+      const btn = document.createElement('button');
+      btn.className = 'tag-pick selected custom';
+      btn.textContent = t;
+      btn.onclick = function() { toggleTag(this); };
+      document.getElementById('tagsPicker').appendChild(btn);
+    }
+  });
 
-// Existing photos — load as already-uploaded cloudinary URLs
-pendingPhotos = getPhotos(e).map(url => ({ file: null, localUrl: url, cloudUrl: url, uploading: false }));
-renderPhotoPreviews();
-document.getElementById(‘saveStatus’).textContent = ‘’;
+  // Existing photos — load as already-uploaded cloudinary URLs
+  pendingPhotos = getPhotos(e).map(url => ({ file: null, localUrl: url, cloudUrl: url, uploading: false }));
+  renderPhotoPreviews();
+  document.getElementById('saveStatus').textContent = '';
 }
 
 function resetForm() {
-editingEntry = null;
-document.getElementById(‘addViewTitle’).textContent  = ‘New Entry’;
-document.getElementById(‘addFormHeading’).textContent = ‘Where did you eat?’;
-document.getElementById(‘submitBtn’).textContent      = ‘Save to Journal ✓’;
-document.getElementById(‘submitBtn’).disabled         = false;
-document.getElementById(‘deleteEntryBtn’).style.display = ‘none’;
-document.getElementById(‘f_date’).value = new Date().toISOString().split(‘T’)[0];
-document.getElementById(‘saveStatus’).textContent = ‘’;
-[‘s_cuisine’,‘s_atmosphere’,‘s_service’,‘s_value’].forEach(id => {
-const el = document.getElementById(id); el.value = 7; el.nextElementSibling.textContent = 7;
-});
-document.querySelectorAll(’.price-btn’).forEach(b => b.classList.remove(‘selected’));
-document.getElementById(‘f_price’).value = ‘’;
-document.querySelectorAll(’.tag-pick’).forEach(t => t.classList.remove(‘selected’));
-document.querySelectorAll(’#tagsPicker .tag-pick.custom’).forEach(b => b.remove());
-[‘f_name’,‘f_companions’,‘f_location’].forEach(id => document.getElementById(id).value = ‘’);
-notesUserOverridden = false;
-document.getElementById(‘f_notes’).value = verdictFromScore(7); // default score is 7
-document.getElementById(‘notesHint’).style.display = ‘block’;
-pendingPhotos = [];
-document.getElementById(‘photoPreviews’).innerHTML = ‘’;
-document.getElementById(‘photoInput’).value = ‘’;
+  editingEntry = null;
+  document.getElementById('addViewTitle').textContent  = 'New Entry';
+  document.getElementById('addFormHeading').textContent = 'Where did you eat?';
+  document.getElementById('submitBtn').textContent      = 'Save to Journal ✓';
+  document.getElementById('submitBtn').disabled         = false;
+  document.getElementById('deleteEntryBtn').style.display = 'none';
+  document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('saveStatus').textContent = '';
+  ['s_cuisine','s_atmosphere','s_service','s_value'].forEach(id => {
+    const el = document.getElementById(id); el.value = 7; el.nextElementSibling.textContent = 7;
+  });
+  document.querySelectorAll('.price-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('f_price').value = '';
+  document.querySelectorAll('.tag-pick').forEach(t => t.classList.remove('selected'));
+  document.querySelectorAll('#tagsPicker .tag-pick.custom').forEach(b => b.remove());
+  ['f_name','f_companions','f_location'].forEach(id => document.getElementById(id).value = '');
+  notesUserOverridden = false;
+  document.getElementById('f_notes').value = verdictFromScore(7); // default score is 7
+  document.getElementById('notesHint').style.display = 'block';
+  pendingPhotos = [];
+  document.getElementById('photoPreviews').innerHTML = '';
+  document.getElementById('photoInput').value = '';
 }
 
 // ─── LOAD ─────────────────────────────────────────────────────────
 async function loadEntries() {
-const list = document.getElementById(‘entriesList’);
-const { username } = getProfile();
-list.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading your journal…</p></div>`;
-try {
-const res = await fetch(`${API_URL}?limit=500`);
-if (!res.ok) throw new Error();
-const all = await res.json();
-allEntries = all.filter(e => !e.username || e.username === username).reverse();
-renderEntries(allEntries);
-} catch {
-list.innerHTML = `<div class="error-state"><p>⚠️ Couldn't load entries. Check your connection.</p></div>`;
-document.getElementById(‘entryCount’).textContent = ‘Connection error’;
-}
+  const list = document.getElementById('entriesList');
+  const { username } = getProfile();
+  list.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading your journal…</p></div>`;
+  try {
+    const res = await fetch(`${API_URL}?limit=500`);
+    if (!res.ok) throw new Error();
+    const all = await res.json();
+    allEntries = all.filter(e => !e.username || e.username === username).reverse();
+    renderEntries(allEntries);
+  } catch {
+    list.innerHTML = `<div class="error-state"><p>⚠️ Couldn't load entries. Check your connection.</p></div>`;
+    document.getElementById('entryCount').textContent = 'Connection error';
+  }
 }
 
 function renderEntries(entries) {
-const list = document.getElementById(‘entriesList’);
-document.getElementById(‘entryCount’).textContent =
-entries.length === 0 ? ‘No entries yet’ : `${entries.length} restaurant${entries.length !== 1 ? 's' : ''} visited`;
+  const list = document.getElementById('entriesList');
+  document.getElementById('entryCount').textContent =
+    entries.length === 0 ? 'No entries yet' : `${entries.length} restaurant${entries.length !== 1 ? 's' : ''} visited`;
 
-if (entries.length === 0) {
-list.innerHTML = `<div class="empty-state"><div class="emoji">🍽️</div><h3>Your journal is empty</h3><p>Tap + to log your first restaurant visit!</p></div>`;
-return;
-}
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="emoji">🍽️</div><h3>Your journal is empty</h3><p>Tap + to log your first restaurant visit!</p></div>`;
+    return;
+  }
 
-// Sort newest first
-const sorted = […entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+  // Sort newest first
+  const sorted = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-const groups = {};
-sorted.forEach(e => {
-const d = new Date(e.date);
-const key = isNaN(d) ? ‘Unknown Date’ : d.toLocaleString(‘default’, { month:‘long’, year:‘numeric’ });
-if (!groups[key]) groups[key] = [];
-groups[key].push(e);
-});
+  const groups = {};
+  sorted.forEach(e => {
+    const d = new Date(e.date);
+    const key = isNaN(d) ? 'Unknown Date' : d.toLocaleString('default', { month:'long', year:'numeric' });
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(e);
+  });
 
-let html = ‘’;
-Object.entries(groups).forEach(([month, items]) => {
-html += `<div class="month-label">${month}</div>`;
-items.forEach((e, i) => {
-const score = calcOverall(e);
-const cuisine = e.cuisine || ‘Other’;
-const emoji = CUISINE_EMOJIS[cuisine] || ‘🍴’;
-const bg = CUISINE_EMOJI_BG[cuisine] || ‘#EEE’;
-const tags = (e.tags || ‘’).split(’,’).filter(Boolean);
-const tagHtml = tags.map(t => `<span class="tag-pill ${TAG_CLASS[t.trim()]||'tag-other'}">${t.trim()}</span>`).join(’’);
-const dateStr = new Date(e.date).toLocaleDateString(‘en-US’, { month:‘short’, day:‘numeric’ });
-const companions = e.companions && e.companions !== ‘Solo’ ? `👥 ${e.companions}` : ‘’;
-const price = e.price ? `<span class="price-badge">${e.price}</span>` : ‘’;
+  let html = '';
+  Object.entries(groups).forEach(([month, items]) => {
+    html += `<div class="month-label">${month}</div>`;
+    items.forEach((e, i) => {
+      const score = calcOverall(e);
+      const cuisine = e.cuisine || 'Other';
+      const emoji = CUISINE_EMOJIS[cuisine] || '🍴';
+      const bg = CUISINE_EMOJI_BG[cuisine] || '#EEE';
+      const tags = (e.tags || '').split(',').filter(Boolean);
+      const tagHtml = tags.map(t => `<span class="tag-pill ${TAG_CLASS[t.trim()]||'tag-other'}">${t.trim()}</span>`).join('');
+      const dateStr = new Date(e.date).toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      const companions = e.companions && e.companions !== 'Solo' ? `👥 ${e.companions}` : '';
+      const price = e.price ? `<span class="price-badge">${e.price}</span>` : '';
 
-```
-  // Show photo thumbnail if available
-  const photos = getPhotos(e);
-  const thumbHtml = photos.length > 0
-    ? `<img class="entry-thumb" src="${photos[0]}" alt="photo" />`
-    : `<div class="entry-thumb-placeholder" style="background:${bg}">${emoji}</div>`;
+      // Show photo thumbnail if available
+      const photos = getPhotos(e);
+      const thumbHtml = photos.length > 0
+        ? `<img class="entry-thumb" src="${photos[0]}" alt="photo" />`
+        : `<div class="entry-thumb-placeholder" style="background:${bg}">${emoji}</div>`;
 
-  html += `<div class="entry-card" style="animation-delay:${i*0.05}s" onclick="showEntryDetail(${allEntries.indexOf(e)})">
-    ${thumbHtml}
-    <div class="entry-info">
-      <div class="entry-name">${e.name}</div>
-      <div class="entry-meta">
-        <span>📅 ${dateStr}</span>
-        ${companions ? `<span>${companions}</span>` : ''}
-        ${price}
-      </div>
-      <div class="entry-tags">${tagHtml}</div>
-    </div>
-    <div class="entry-score">
-      <div class="score-num">${score}</div>
-      <div class="score-denom">/10</div>
-      <div class="score-bar"><div class="score-fill" style="width:${score === '—' ? 0 : score*10}%"></div></div>
-    </div>
-  </div>`;
-});
-```
-
-});
-list.innerHTML = html;
+      html += `<div class="entry-card" style="animation-delay:${i*0.05}s" onclick="showEntryDetail(${allEntries.indexOf(e)})">
+        ${thumbHtml}
+        <div class="entry-info">
+          <div class="entry-name">${e.name}</div>
+          <div class="entry-meta">
+            <span>📅 ${dateStr}</span>
+            ${companions ? `<span>${companions}</span>` : ''}
+            ${price}
+          </div>
+          <div class="entry-tags">${tagHtml}</div>
+        </div>
+        <div class="entry-score">
+          <div class="score-num">${score}</div>
+          <div class="score-denom">/10</div>
+          <div class="score-bar"><div class="score-fill" style="width:${score === '—' ? 0 : score*10}%"></div></div>
+        </div>
+      </div>`;
+    });
+  });
+  list.innerHTML = html;
 }
 
 // ─── FILTER ───────────────────────────────────────────────────────
 function filterEntries(filter, btn) {
-document.querySelectorAll(’.chip’).forEach(c => c.classList.remove(‘active’));
-btn.classList.add(‘active’);
-if (filter === ‘All’) { renderEntries(allEntries); return; }
-renderEntries(allEntries.filter(e => e.cuisine === filter || (e.tags || ‘’).includes(filter)));
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  if (filter === 'All') { renderEntries(allEntries); return; }
+  renderEntries(allEntries.filter(e => e.cuisine === filter || (e.tags || '').includes(filter)));
 }
 
 // ─── DETAIL ───────────────────────────────────────────────────────
 function showEntryDetail(idx) {
-const e = allEntries[idx];
-window._detailEntryIdx = idx; // store index for edit button
-const cuisine = e.cuisine || ‘Other’;
-const photos = getPhotos(e);
+  const e = allEntries[idx];
+  window._detailEntryIdx = idx; // store index for edit button
+  const cuisine = e.cuisine || 'Other';
+  const photos = getPhotos(e);
 
-document.getElementById(‘detailDate’).textContent =
-new Date(e.date).toLocaleDateString(‘en-US’, { weekday:‘long’, year:‘numeric’, month:‘long’, day:‘numeric’ });
+  document.getElementById('detailDate').textContent =
+    new Date(e.date).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-// Hero — use first photo if available, else gradient
-const hero = document.getElementById(‘detailHero’);
-if (photos.length > 0) {
-hero.innerHTML = `<img class="detail-hero-img" src="${photos[0]}" alt="${e.name}" /><div class="detail-hero-overlay"></div>`;
-} else {
-hero.innerHTML = `<div class="detail-hero-placeholder" style="background:${CUISINE_BG[cuisine]||CUISINE_BG.Other}">${CUISINE_EMOJIS[cuisine]||'🍴'}</div>`;
-}
+  // Hero — use first photo if available, else gradient
+  const hero = document.getElementById('detailHero');
+  if (photos.length > 0) {
+    hero.innerHTML = `<img class="detail-hero-img" src="${photos[0]}" alt="${e.name}" /><div class="detail-hero-overlay"></div>`;
+  } else {
+    hero.innerHTML = `<div class="detail-hero-placeholder" style="background:${CUISINE_BG[cuisine]||CUISINE_BG.Other}">${CUISINE_EMOJIS[cuisine]||'🍴'}</div>`;
+  }
 
-document.getElementById(‘detailName’).textContent = e.name;
-document.getElementById(‘detailSub’).innerHTML =
-`<span>${cuisine}</span>${e.location ? `<span>📍 ${e.location}</span>`: ''}${e.price ?`<span class="price-badge">${e.price}</span>` : ''}`;
+  document.getElementById('detailName').textContent = e.name;
+  document.getElementById('detailSub').innerHTML =
+    `<span>${cuisine}</span>${e.location ? `<span>📍 ${e.location}</span>` : ''}${e.price ? `<span class="price-badge">${e.price}</span>` : ''}`;
 
-const tags = (e.tags || ‘’).split(’,’).filter(Boolean);
-document.getElementById(‘detailTags’).innerHTML =
-tags.map(t => `<span class="tag-pill ${TAG_CLASS[t.trim()]||'tag-other'}">${t.trim()}</span>`).join(’’);
+  const tags = (e.tags || '').split(',').filter(Boolean);
+  document.getElementById('detailTags').innerHTML =
+    tags.map(t => `<span class="tag-pill ${TAG_CLASS[t.trim()]||'tag-other'}">${t.trim()}</span>`).join('');
 
-const score = calcOverall(e);
-document.getElementById(‘detailScore’).innerHTML = `${score} <span>/10</span>`;
-document.getElementById(‘detailVerdict’).textContent = verdict(score);
+  const score = calcOverall(e);
+  document.getElementById('detailScore').innerHTML = `${score} <span>/10</span>`;
+  document.getElementById('detailVerdict').textContent = verdict(score);
 
-document.getElementById(‘detailAspects’).innerHTML = [
-{ name:‘🍽️ Cuisine’,    key:‘score_cuisine’    },
-{ name:‘🌿 Atmosphere’, key:‘score_atmosphere’ },
-{ name:‘🤝 Service’,    key:‘score_service’    },
-{ name:‘💰 Value’,      key:‘score_value’      },
-].map(a => {
-const val = parseFloat(e[a.key]) || 0;
-return `<div class="aspect-row"> <div class="aspect-name">${a.name}</div> <div class="aspect-track"><div class="aspect-fill ${getColor(val)}" style="width:${val*10}%"></div></div> <div class="aspect-val">${val}</div> </div>`;
-}).join(’’);
+  document.getElementById('detailAspects').innerHTML = [
+    { name:'🍽️ Cuisine',    key:'score_cuisine'    },
+    { name:'🌿 Atmosphere', key:'score_atmosphere' },
+    { name:'🤝 Service',    key:'score_service'    },
+    { name:'💰 Value',      key:'score_value'      },
+  ].map(a => {
+    const val = parseFloat(e[a.key]) || 0;
+    return `<div class="aspect-row">
+      <div class="aspect-name">${a.name}</div>
+      <div class="aspect-track"><div class="aspect-fill ${getColor(val)}" style="width:${val*10}%"></div></div>
+      <div class="aspect-val">${val}</div>
+    </div>`;
+  }).join('');
 
-// Photos gallery
-const photosEl = document.getElementById(‘detailPhotos’);
-if (photos.length > 0) {
-photosEl.innerHTML = `<div class="photo-gallery"> ${photos.map((src, i) => `<img class="gallery-img" src="${src}" alt="photo ${i+1}" onclick="openLightbox('${src}')" />`).join('')} </div>`;
-} else {
-photosEl.innerHTML = `<p class="no-photos">No photos added for this visit.</p>`;
-}
+  // Photos gallery
+  const photosEl = document.getElementById('detailPhotos');
+  if (photos.length > 0) {
+    photosEl.innerHTML = `<div class="photo-gallery">
+      ${photos.map((src, i) => `<img class="gallery-img" src="${src}" alt="photo ${i+1}" onclick="openLightbox('${src}')" />`).join('')}
+    </div>`;
+  } else {
+    photosEl.innerHTML = `<p class="no-photos">No photos added for this visit.</p>`;
+  }
 
-// Map
-const mapEl = document.getElementById(‘detailMap’);
-const mapQuery = encodeURIComponent(`${e.name}${e.location ? ' ' + e.location : ''}`);
-const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
-const embedUrl = `https://maps.google.com/maps?q=${mapQuery}&output=embed&z=15`;
-mapEl.innerHTML = `<a class="map-block" href="${mapsUrl}" target="_blank" rel="noopener"> <div class="map-preview"> <iframe src="${embedUrl}" loading="lazy" title="Map of ${e.name}"></iframe> </div> <div class="map-footer"> <div><strong>📍 ${e.name}</strong>${e.location ?`<span style="color:var(--muted);margin-left:0.5rem">${e.location}</span>` : ''}</div> <div class="map-cta">Open in Maps →</div> </div> </a>`;
+  // Map
+  const mapEl = document.getElementById('detailMap');
+  const mapQuery = encodeURIComponent(`${e.name}${e.location ? ' ' + e.location : ''}`);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+  const embedUrl = `https://maps.google.com/maps?q=${mapQuery}&output=embed&z=15`;
+  mapEl.innerHTML = `
+    <a class="map-block" href="${mapsUrl}" target="_blank" rel="noopener">
+      <div class="map-preview">
+        <iframe src="${embedUrl}" loading="lazy" title="Map of ${e.name}"></iframe>
+      </div>
+      <div class="map-footer">
+        <div><strong>📍 ${e.name}</strong>${e.location ? `<span style="color:var(--muted);margin-left:0.5rem">${e.location}</span>` : ''}</div>
+        <div class="map-cta">Open in Maps →</div>
+      </div>
+    </a>`;
 
-// Companions
-const companions = (e.companions || ‘’).split(’,’).filter(Boolean);
-const compEl = document.getElementById(‘detailCompanions’);
-if (!e.companions || e.companions === ‘Solo’ || companions.length === 0) {
-compEl.innerHTML = `<div class="companion-pill">🚶 Solo visit</div>`;
-} else {
-compEl.innerHTML = companions.map(c => ` <div class="companion-pill"> <div class="companion-avatar">${c.trim()[0].toUpperCase()}</div>${c.trim()} </div>`).join(’’);
-}
+  // Companions
+  const companions = (e.companions || '').split(',').filter(Boolean);
+  const compEl = document.getElementById('detailCompanions');
+  if (!e.companions || e.companions === 'Solo' || companions.length === 0) {
+    compEl.innerHTML = `<div class="companion-pill">🚶 Solo visit</div>`;
+  } else {
+    compEl.innerHTML = companions.map(c => `
+      <div class="companion-pill">
+        <div class="companion-avatar">${c.trim()[0].toUpperCase()}</div>${c.trim()}
+      </div>`).join('');
+  }
 
-document.getElementById(‘detailNotes’).textContent = e.notes ? `"${e.notes}"` : ‘No notes added.’;
-showView(‘detailView’);
+  document.getElementById('detailNotes').textContent = e.notes ? `"${e.notes}"` : 'No notes added.';
+  showView('detailView');
 }
 
 // ─── PHOTOS (Cloudinary) ──────────────────────────────────────────
-const CLOUDINARY_CLOUD = ‘drhfdwkzd’;
-const CLOUDINARY_PRESET = ‘DOWapp1’;
+const CLOUDINARY_CLOUD = 'drhfdwkzd';
+const CLOUDINARY_PRESET = 'DOWapp1';
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`;
 
 // Photos are now stored as comma-separated URLs in the sheet row (photos column)
 function getPhotos(entry) {
-if (!entry.photos) return [];
-return entry.photos.split(’,’).map(u => u.trim()).filter(Boolean);
+  if (!entry.photos) return [];
+  return entry.photos.split(',').map(u => u.trim()).filter(Boolean);
 }
 
 function handlePhotoUpload(event) {
-const files = […event.target.files].slice(0, 5 - pendingPhotos.length);
-const previewsEl = document.getElementById(‘photoPreviews’);
+  const files = [...event.target.files].slice(0, 5 - pendingPhotos.length);
+  const previewsEl = document.getElementById('photoPreviews');
 
-files.forEach(file => {
-// Show local preview immediately while upload happens in background
-const localUrl = URL.createObjectURL(file);
-const idx = pendingPhotos.length;
-pendingPhotos.push({ file, localUrl, cloudUrl: null, uploading: true });
-renderPhotoPreviews();
+  files.forEach(file => {
+    // Show local preview immediately while upload happens in background
+    const localUrl = URL.createObjectURL(file);
+    const idx = pendingPhotos.length;
+    pendingPhotos.push({ file, localUrl, cloudUrl: null, uploading: true });
+    renderPhotoPreviews();
 
-```
-// Upload to Cloudinary
-const formData = new FormData();
-formData.append('file', file);
-formData.append('upload_preset', CLOUDINARY_PRESET);
+    // Upload to Cloudinary
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
 
-fetch(CLOUDINARY_URL, { method: 'POST', body: formData })
-  .then(r => r.json())
-  .then(data => {
-    const i = pendingPhotos.findIndex(p => p.localUrl === localUrl);
-    if (i !== -1) {
-      pendingPhotos[i].cloudUrl = data.secure_url;
-      pendingPhotos[i].uploading = false;
-      renderPhotoPreviews();
-    }
-  })
-  .catch(() => {
-    const i = pendingPhotos.findIndex(p => p.localUrl === localUrl);
-    if (i !== -1) {
-      pendingPhotos[i].uploading = false;
-      pendingPhotos[i].error = true;
-      renderPhotoPreviews();
-    }
+    fetch(CLOUDINARY_URL, { method: 'POST', body: formData })
+      .then(r => r.json())
+      .then(data => {
+        const i = pendingPhotos.findIndex(p => p.localUrl === localUrl);
+        if (i !== -1) {
+          pendingPhotos[i].cloudUrl = data.secure_url;
+          pendingPhotos[i].uploading = false;
+          renderPhotoPreviews();
+        }
+      })
+      .catch(() => {
+        const i = pendingPhotos.findIndex(p => p.localUrl === localUrl);
+        if (i !== -1) {
+          pendingPhotos[i].uploading = false;
+          pendingPhotos[i].error = true;
+          renderPhotoPreviews();
+        }
+      });
   });
-```
-
-});
 }
 
 function renderPhotoPreviews() {
-document.getElementById(‘photoPreviews’).innerHTML = pendingPhotos.map((p, i) => `<div class="preview-wrap"> <img class="preview-img" src="${p.localUrl}" alt="preview" style="opacity:${p.uploading ? 0.5 : 1}" /> ${p.uploading ?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;background:rgba(0,0,0,0.3);border-radius:0.5rem">⏳</div>`: ''} ${p.error ?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;background:rgba(180,0,0,0.5);border-radius:0.5rem">⚠️</div>` : ''} <button class="remove-photo" onclick="removePhoto(${i})">✕</button> </div>`).join(’’);
+  document.getElementById('photoPreviews').innerHTML = pendingPhotos.map((p, i) => `
+    <div class="preview-wrap">
+      <img class="preview-img" src="${p.localUrl}" alt="preview" style="opacity:${p.uploading ? 0.5 : 1}" />
+      ${p.uploading ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;background:rgba(0,0,0,0.3);border-radius:0.5rem">⏳</div>` : ''}
+      ${p.error ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;background:rgba(180,0,0,0.5);border-radius:0.5rem">⚠️</div>` : ''}
+      <button class="remove-photo" onclick="removePhoto(${i})">✕</button>
+    </div>`).join('');
 }
 
 function removePhoto(i) {
-pendingPhotos.splice(i, 1);
-renderPhotoPreviews();
+  pendingPhotos.splice(i, 1);
+  renderPhotoPreviews();
 }
 
 function openLightbox(src) {
-document.getElementById(‘lightboxImg’).src = src;
-document.getElementById(‘lightbox’).classList.add(‘open’);
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
 }
 function closeLightbox() {
-document.getElementById(‘lightbox’).classList.remove(‘open’);
+  document.getElementById('lightbox').classList.remove('open');
 }
 
 // ─── DELETE ───────────────────────────────────────────────────────
 async function deleteEntry() {
-if (!editingEntry) return;
-const name = editingEntry.name || ‘this entry’;
-if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  if (!editingEntry) return;
+  const name = editingEntry.name || 'this entry';
+  if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
 
-const btn = document.getElementById(‘deleteEntryBtn’);
-btn.textContent = ‘Deleting…’;
-btn.disabled = true;
+  const btn = document.getElementById('deleteEntryBtn');
+  btn.textContent = 'Deleting…';
+  btn.disabled = true;
 
-try {
-let res;
-if (editingEntry.id) {
-res = await fetch(`${API_URL}/id/${encodeURIComponent(editingEntry.id)}`, {
-method: ‘DELETE’,
-headers: { ‘Content-Type’: ‘application/json’, ‘Accept’: ‘application/json’ },
-});
-} else {
-const sheetRow = (editingEntry._idx || 0) + 2;
-res = await fetch(`${API_URL}/id/${sheetRow}`, {
-method: ‘DELETE’,
-headers: { ‘Content-Type’: ‘application/json’, ‘Accept’: ‘application/json’ },
-});
-}
-if (!res.ok) throw new Error(`HTTP ${res.status}`);
-editingEntry = null;
-showView(‘listView’);
-} catch (err) {
-btn.textContent = ‘🗑 Delete this entry’;
-btn.disabled = false;
-document.getElementById(‘saveStatus’).textContent = `⚠️ Could not delete. ${err.message}`;
-}
+  try {
+    let res;
+    if (editingEntry.id) {
+      res = await fetch(`${API_URL}/id/${encodeURIComponent(editingEntry.id)}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      });
+    } else {
+      const sheetRow = (editingEntry._idx || 0) + 2;
+      res = await fetch(`${API_URL}/id/${sheetRow}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      });
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    editingEntry = null;
+    showView('listView');
+  } catch (err) {
+    btn.textContent = '🗑 Delete this entry';
+    btn.disabled = false;
+    document.getElementById('saveStatus').textContent = `⚠️ Could not delete. ${err.message}`;
+  }
 }
 
 // ─── SAVE / UPDATE ────────────────────────────────────────────────
 async function saveEntry() {
-const name = document.getElementById(‘f_name’).value.trim();
-const date = document.getElementById(‘f_date’).value;
-if (!name || !date) { alert(‘Please fill in the restaurant name and date.’); return; }
+  const name = document.getElementById('f_name').value.trim();
+  const date = document.getElementById('f_date').value;
+  if (!name || !date) { alert('Please fill in the restaurant name and date.'); return; }
 
-const btn = document.getElementById(‘submitBtn’);
-const status = document.getElementById(‘saveStatus’);
-btn.disabled = true; status.textContent = ‘’;
+  const btn = document.getElementById('submitBtn');
+  const status = document.getElementById('saveStatus');
+  btn.disabled = true; status.textContent = '';
 
-// Wait for any still-uploading photos
-if (pendingPhotos.some(p => p.uploading)) {
-btn.textContent = ‘⏳ Waiting for photos…’;
-await new Promise(resolve => {
-const interval = setInterval(() => {
-if (!pendingPhotos.some(p => p.uploading)) { clearInterval(interval); resolve(); }
-}, 400);
-});
-}
-btn.textContent = ‘Saving…’;
+  // Wait for any still-uploading photos
+  if (pendingPhotos.some(p => p.uploading)) {
+    btn.textContent = '⏳ Waiting for photos…';
+    await new Promise(resolve => {
+      const interval = setInterval(() => {
+        if (!pendingPhotos.some(p => p.uploading)) { clearInterval(interval); resolve(); }
+      }, 400);
+    });
+  }
+  btn.textContent = 'Saving…';
 
-const photoUrls = pendingPhotos
-.filter(p => p.cloudUrl && !p.error)
-.map(p => p.cloudUrl)
-.join(’,’);
+  const photoUrls = pendingPhotos
+    .filter(p => p.cloudUrl && !p.error)
+    .map(p => p.cloudUrl)
+    .join(',');
 
-const { username } = getProfile();
-const tags = […document.querySelectorAll(’.tag-pick.selected’)].map(t => t.textContent).join(’, ’);
-const isNew = !editingEntry;
-const row = {
-id: isNew ? `${Date.now()}_${Math.random().toString(36).slice(2,7)}` : editingEntry.id,
-username,
-name, date,
-cuisine:          document.getElementById(‘f_cuisine’).value,
-location:         document.getElementById(‘f_location’).value.trim(),
-companions:       document.getElementById(‘f_companions’).value.trim() || ‘Solo’,
-price:            document.getElementById(‘f_price’).value,
-tags,
-score_cuisine:    document.getElementById(‘s_cuisine’).value,
-score_atmosphere: document.getElementById(‘s_atmosphere’).value,
-score_service:    document.getElementById(‘s_service’).value,
-score_value:      document.getElementById(‘s_value’).value,
-notes:            document.getElementById(‘f_notes’).value.trim(),
-photos:           photoUrls,
-};
+  const { username } = getProfile();
+  const tags = [...document.querySelectorAll('.tag-pick.selected')].map(t => t.textContent).join(', ');
+  const isNew = !editingEntry;
+  const row = {
+    id: isNew ? `${Date.now()}_${Math.random().toString(36).slice(2,7)}` : editingEntry.id,
+    username,
+    name, date,
+    cuisine:          document.getElementById('f_cuisine').value,
+    location:         document.getElementById('f_location').value.trim(),
+    companions:       document.getElementById('f_companions').value.trim() || 'Solo',
+    price:            document.getElementById('f_price').value,
+    tags,
+    score_cuisine:    document.getElementById('s_cuisine').value,
+    score_atmosphere: document.getElementById('s_atmosphere').value,
+    score_service:    document.getElementById('s_service').value,
+    score_value:      document.getElementById('s_value').value,
+    notes:            document.getElementById('f_notes').value.trim(),
+    photos:           photoUrls,
+  };
 
-try {
-let res;
-const wasEditing = !!editingEntry; // capture before any nulling
-if (editingEntry) {
-if (editingEntry.id) {
-// PATCH by unique id column value
-res = await fetch(`${API_URL}/id/${encodeURIComponent(editingEntry.id)}`, {
-method: ‘PATCH’,
-headers: { ‘Content-Type’: ‘application/json’, ‘Accept’: ‘application/json’ },
-body: JSON.stringify({ data: row })
-});
-} else {
-// Fallback: old entry with no id — PATCH by row index (sheet row = _idx + 2)
-const sheetRow = (editingEntry._idx || 0) + 2;
-res = await fetch(`${API_URL}/id/${sheetRow}`, {
-method: ‘PATCH’,
-headers: { ‘Content-Type’: ‘application/json’, ‘Accept’: ‘application/json’ },
-body: JSON.stringify({ data: row })
-});
-}
-} else {
-// POST — new entry
-res = await fetch(API_URL, {
-method: ‘POST’,
-headers: { ‘Content-Type’: ‘application/json’, ‘Accept’: ‘application/json’ },
-body: JSON.stringify({ data: [row] })
-});
-}
-if (!res.ok) throw new Error(`HTTP ${res.status}`);
-btn.textContent = wasEditing ? ‘✓ Updated!’ : ‘✓ Saved!’;
-status.textContent = photoUrls ? ‘📸 Photos saved!’ : wasEditing ? ‘Entry updated.’ : ‘Entry saved.’;
-editingEntry = null;
-setTimeout(() => showView(‘listView’), 1200);
-} catch (err) {
-btn.disabled = false;
-btn.textContent = editingEntry ? ‘Save Changes ✓’ : ‘Save to Journal ✓’;
-status.textContent = `⚠️ Could not save. ${err.message || 'Check your connection.'}`;
-}
+  try {
+    let res;
+    const wasEditing = !!editingEntry; // capture before any nulling
+    if (editingEntry) {
+      if (editingEntry.id) {
+        // PATCH by unique id column value
+        res = await fetch(`${API_URL}/id/${encodeURIComponent(editingEntry.id)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ data: row })
+        });
+      } else {
+        // Fallback: old entry with no id — PATCH by row index (sheet row = _idx + 2)
+        const sheetRow = (editingEntry._idx || 0) + 2;
+        res = await fetch(`${API_URL}/id/${sheetRow}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ data: row })
+        });
+      }
+    } else {
+      // POST — new entry
+      res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ data: [row] })
+      });
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    btn.textContent = wasEditing ? '✓ Updated!' : '✓ Saved!';
+    status.textContent = photoUrls ? '📸 Photos saved!' : wasEditing ? 'Entry updated.' : 'Entry saved.';
+    editingEntry = null;
+    setTimeout(() => showView('listView'), 1200);
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = editingEntry ? 'Save Changes ✓' : 'Save to Journal ✓';
+    status.textContent = `⚠️ Could not save. ${err.message || 'Check your connection.'}`;
+  }
 }
 
 // ─── HELPERS ──────────────────────────────────────────────────────
 function calcOverall(e) {
-const vals = [‘score_cuisine’,‘score_atmosphere’,‘score_service’,‘score_value’]
-.map(k => parseFloat(e[k])).filter(v => !isNaN(v));
-return vals.length ? (vals.reduce((a,b) => a+b,0) / vals.length).toFixed(1) : ‘—’;
+  const vals = ['score_cuisine','score_atmosphere','score_service','score_value']
+    .map(k => parseFloat(e[k])).filter(v => !isNaN(v));
+  return vals.length ? (vals.reduce((a,b) => a+b,0) / vals.length).toFixed(1) : '—';
 }
 function verdict(score) {
-if (score === ‘—’) return ‘’;
-if (score >= 9)   return ‘Exceptional — absolutely worth returning’;
-if (score >= 8)   return ‘Excellent — highly recommended’;
-if (score >= 7)   return ‘Great — would go back’;
-if (score >= 6)   return ‘Good — enjoyable with some caveats’;
-return ‘Mixed — wouldn't rush back’;
+  if (score === '—') return '';
+  if (score >= 9)   return 'Exceptional — absolutely worth returning';
+  if (score >= 8)   return 'Excellent — highly recommended';
+  if (score >= 7)   return 'Great — would go back';
+  if (score >= 6)   return 'Good — enjoyable with some caveats';
+  return 'Mixed — wouldn\'t rush back';
 }
 function getColor(val) {
-if (val >= 8) return ‘fill-high’;
-if (val >= 6) return ‘fill-mid’;
-return ‘fill-low’;
+  if (val >= 8) return 'fill-high';
+  if (val >= 6) return 'fill-mid';
+  return 'fill-low';
 }
 function updateSlider(el) { el.nextElementSibling.textContent = el.value; }
-function toggleTag(el)    { el.classList.toggle(‘selected’); }
+function toggleTag(el)    { el.classList.toggle('selected'); }
 
 // ─── AUTO NOTE FROM SCORE ──────────────────────────────────────────
 let notesUserOverridden = false;
 
 function calcFormScore() {
-const ids = [‘s_cuisine’,‘s_atmosphere’,‘s_service’,‘s_value’];
-const vals = ids.map(id => parseFloat(document.getElementById(id)?.value)).filter(v => !isNaN(v));
-return vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length) : 7;
+  const ids = ['s_cuisine','s_atmosphere','s_service','s_value'];
+  const vals = ids.map(id => parseFloat(document.getElementById(id)?.value)).filter(v => !isNaN(v));
+  return vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length) : 7;
 }
 
 function verdictFromScore(score) {
-if (score >= 9)  return ‘Exceptional — absolutely worth returning.’;
-if (score >= 8)  return ‘Excellent — highly recommended.’;
-if (score >= 7)  return ‘Great — would go back.’;
-if (score >= 6)  return ‘Good — enjoyable with some caveats.’;
-return ‘Mixed — wouldn't rush back.’;
+  if (score >= 9)  return 'Exceptional — absolutely worth returning.';
+  if (score >= 8)  return 'Excellent — highly recommended.';
+  if (score >= 7)  return 'Great — would go back.';
+  if (score >= 6)  return 'Good — enjoyable with some caveats.';
+  return 'Mixed — wouldn\'t rush back.';
 }
 
 function updateAutoNote() {
-if (notesUserOverridden) return;
-const notes = document.getElementById(‘f_notes’);
-if (!notes) return;
-const score = calcFormScore();
-notes.value = verdictFromScore(score);
-document.getElementById(‘notesHint’).style.display = ‘block’;
+  if (notesUserOverridden) return;
+  const notes = document.getElementById('f_notes');
+  if (!notes) return;
+  const score = calcFormScore();
+  notes.value = verdictFromScore(score);
+  document.getElementById('notesHint').style.display = 'block';
 }
 
 function handleNotesInput(el) {
-const autoText = verdictFromScore(calcFormScore());
-if (el.value.trim() !== autoText.trim()) {
-notesUserOverridden = true;
-document.getElementById(‘notesHint’).style.display = ‘none’;
-} else {
-notesUserOverridden = false;
-}
+  const autoText = verdictFromScore(calcFormScore());
+  if (el.value.trim() !== autoText.trim()) {
+    notesUserOverridden = true;
+    document.getElementById('notesHint').style.display = 'none';
+  } else {
+    notesUserOverridden = false;
+  }
 }
 function selectPrice(btn, val) {
-document.querySelectorAll(’.price-btn’).forEach(b => b.classList.remove(‘selected’));
-btn.classList.add(‘selected’);
-document.getElementById(‘f_price’).value = val;
+  document.querySelectorAll('.price-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('f_price').value = val;
 }
 function addCustomTag() {
-const input = document.getElementById(‘customTagInput’);
-const val = input.value.trim();
-if (!val) return;
-// Check against ALL existing tag text, including already-restored custom ones
-const existing = […document.querySelectorAll(’#tagsPicker .tag-pick’)]
-.map(t => t.textContent.trim().toLowerCase());
-if (existing.includes(val.toLowerCase())) {
-input.value = ‘’;
-return;
-}
-const btn = document.createElement(‘button’);
-btn.className = ‘tag-pick selected custom’;
-btn.textContent = val;
-btn.onclick = function() { toggleTag(this); };
-document.getElementById(‘tagsPicker’).appendChild(btn);
-input.value = ‘’;
+  const input = document.getElementById('customTagInput');
+  const val = input.value.trim();
+  if (!val) return;
+  // Check against ALL existing tag text, including already-restored custom ones
+  const existing = [...document.querySelectorAll('#tagsPicker .tag-pick')]
+    .map(t => t.textContent.trim().toLowerCase());
+  if (existing.includes(val.toLowerCase())) {
+    input.value = '';
+    return;
+  }
+  const btn = document.createElement('button');
+  btn.className = 'tag-pick selected custom';
+  btn.textContent = val;
+  btn.onclick = function() { toggleTag(this); };
+  document.getElementById('tagsPicker').appendChild(btn);
+  input.value = '';
 }
 
 // ─── SWIPE GESTURES ───────────────────────────────────────────────
 (function() {
-let touchStartX = 0;
-let touchStartY = 0;
-let touchStartTime = 0;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
 
-document.addEventListener(‘touchstart’, e => {
-touchStartX    = e.touches[0].clientX;
-touchStartY    = e.touches[0].clientY;
-touchStartTime = Date.now();
-}, { passive: true });
+  document.addEventListener('touchstart', e => {
+    touchStartX    = e.touches[0].clientX;
+    touchStartY    = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
 
-document.addEventListener(‘touchend’, e => {
-const dx       = e.changedTouches[0].clientX - touchStartX;
-const dy       = e.changedTouches[0].clientY - touchStartY;
-const elapsed  = Date.now() - touchStartTime;
-const absX     = Math.abs(dx);
-const absY     = Math.abs(dy);
+  document.addEventListener('touchend', e => {
+    const dx       = e.changedTouches[0].clientX - touchStartX;
+    const dy       = e.changedTouches[0].clientY - touchStartY;
+    const elapsed  = Date.now() - touchStartTime;
+    const absX     = Math.abs(dx);
+    const absY     = Math.abs(dy);
 
-```
-// Must be: fast enough, mostly horizontal, far enough right-to-left swipe from left edge
-const isSwipeBack = (
-  elapsed < 350 &&        // quick gesture
-  absX > 60 &&            // moved enough horizontally
-  absX > absY * 2 &&      // more horizontal than vertical
-  dx > 0 &&               // swiping RIGHT (back gesture)
-  touchStartX < 60        // started from left edge (like iOS back)
-);
+    // Must be: fast enough, mostly horizontal, far enough right-to-left swipe from left edge
+    const isSwipeBack = (
+      elapsed < 350 &&        // quick gesture
+      absX > 60 &&            // moved enough horizontally
+      absX > absY * 2 &&      // more horizontal than vertical
+      dx > 0 &&               // swiping RIGHT (back gesture)
+      touchStartX < 60        // started from left edge (like iOS back)
+    );
 
-if (!isSwipeBack) return;
+    if (!isSwipeBack) return;
 
-// Figure out which view is active and go back
-const active = document.querySelector('.view.active');
-if (!active) return;
-const id = active.id;
+    // Figure out which view is active and go back
+    const active = document.querySelector('.view.active');
+    if (!active) return;
+    const id = active.id;
 
-if (id === 'detailView') {
-  showView('listView');
-} else if (id === 'addView') {
-  cancelAddEdit();
-} else if (id === 'profileView') {
-  switchTab('listView', document.querySelector('.nav-tab'));
-}
-```
-
-}, { passive: true });
+    if (id === 'detailView') {
+      showView('listView');
+    } else if (id === 'addView') {
+      cancelAddEdit();
+    } else if (id === 'profileView') {
+      switchTab('listView', document.querySelector('.nav-tab'));
+    }
+  }, { passive: true });
 })();
 
 // ─── INSTALL MODAL ────────────────────────────────────────────────
 const INSTALL_STEPS = {
-ios: [
-{ text: ‘Open <strong>dontorderwrong.com</strong> in Safari (must be Safari)’ },
-{ text: ‘Tap the <strong>Share button</strong> at the bottom of the screen (box with arrow)’ },
-{ text: ‘Scroll down and tap <strong>“Add to Home Screen”</strong>’ },
-{ text: ‘Tap <strong>Add</strong> — the DOW icon appears on your home screen!’ },
-],
-android: [
-{ text: ‘Open <strong>dontorderwrong.com</strong> in Chrome’ },
-{ text: ‘Tap the <strong>three-dot menu</strong> in the top right’ },
-{ text: ‘Tap <strong>“Add to Home screen”</strong> or use the Install button below’ },
-{ text: ‘Tap <strong>Add</strong> — DOW is now on your home screen!’ },
-],
-desktop: [
-{ text: ‘Open <strong>dontorderwrong.com</strong> in Chrome or Edge’ },
-{ text: ‘Look for the <strong>install icon</strong> (⊕) in the address bar on the right’ },
-{ text: ‘Click it and select <strong>“Install”</strong>’ },
-{ text: ‘DOW opens as its own window, just like a native app!’ },
-],
+  ios: [
+    { text: 'Open <strong>dontorderwrong.com</strong> in Safari (must be Safari)' },
+    { text: 'Tap the <strong>Share button</strong> at the bottom of the screen (box with arrow)' },
+    { text: 'Scroll down and tap <strong>"Add to Home Screen"</strong>' },
+    { text: 'Tap <strong>Add</strong> — the DOW icon appears on your home screen!' },
+  ],
+  android: [
+    { text: 'Open <strong>dontorderwrong.com</strong> in Chrome' },
+    { text: 'Tap the <strong>three-dot menu</strong> in the top right' },
+    { text: 'Tap <strong>"Add to Home screen"</strong> or use the Install button below' },
+    { text: 'Tap <strong>Add</strong> — DOW is now on your home screen!' },
+  ],
+  desktop: [
+    { text: 'Open <strong>dontorderwrong.com</strong> in Chrome or Edge' },
+    { text: 'Look for the <strong>install icon</strong> (⊕) in the address bar on the right' },
+    { text: 'Click it and select <strong>"Install"</strong>' },
+    { text: 'DOW opens as its own window, just like a native app!' },
+  ],
 };
 
-let currentPlatform = ‘ios’;
+let currentPlatform = 'ios';
 
 function showInstallModal() {
-// Auto-detect platform
-const ua = navigator.userAgent;
-if (/android/i.test(ua)) currentPlatform = ‘android’;
-else if (/iphone|ipad|ipod/i.test(ua)) currentPlatform = ‘ios’;
-else currentPlatform = ‘desktop’;
+  // Auto-detect platform
+  const ua = navigator.userAgent;
+  if (/android/i.test(ua)) currentPlatform = 'android';
+  else if (/iphone|ipad|ipod/i.test(ua)) currentPlatform = 'ios';
+  else currentPlatform = 'desktop';
 
-showInstallPlatform(currentPlatform);
-document.getElementById(‘installModal’).classList.add(‘open’);
+  showInstallPlatform(currentPlatform);
+  document.getElementById('installModal').classList.add('open');
 }
 
 function closeInstallModal() {
-document.getElementById(‘installModal’).classList.remove(‘open’);
+  document.getElementById('installModal').classList.remove('open');
 }
 
 function showInstallPlatform(platform) {
-currentPlatform = platform;
-[‘ios’,‘android’,‘desktop’].forEach(p => {
-document.getElementById(p + ‘Btn’).classList.toggle(‘active’, p === platform);
-});
-const steps = INSTALL_STEPS[platform];
-document.getElementById(‘installSteps’).innerHTML = steps.map((s, i) => `<li><div class="step-num">${i+1}</div><div>${s.text}</div></li>`).join(’’);
-// Show native install button for Android if prompt available
-document.getElementById(‘androidInstallBtn’).style.display =
-(platform === ‘android’ && deferredPrompt) ? ‘block’ : ‘none’;
+  currentPlatform = platform;
+  ['ios','android','desktop'].forEach(p => {
+    document.getElementById(p + 'Btn').classList.toggle('active', p === platform);
+  });
+  const steps = INSTALL_STEPS[platform];
+  document.getElementById('installSteps').innerHTML = steps.map((s, i) => `
+    <li><div class="step-num">${i+1}</div><div>${s.text}</div></li>
+  `).join('');
+  // Show native install button for Android if prompt available
+  document.getElementById('androidInstallBtn').style.display =
+    (platform === 'android' && deferredPrompt) ? 'block' : 'none';
 }
 
 function triggerAndroidInstall() {
-if (deferredPrompt) {
-deferredPrompt.prompt();
-deferredPrompt.userChoice.then(() => {
-deferredPrompt = null;
-closeInstallModal();
-});
-}
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      closeInstallModal();
+    });
+  }
 }
 
 // ─── FLOATING FOOD EMOJIS ─────────────────────────────────────────
 (function() {
-const emojis = [‘🍕’,‘🍣’,‘🌮’,‘🍜’,‘🥐’,‘🍔’,‘🥗’,‘🍷’,‘🍦’,‘🧁’,‘🥩’,‘🍱’,‘🫕’,‘🥘’,‘🍝’,‘🫔’,‘🥨’,‘🍤’,‘🧆’,‘🍙’];
-const container = document.getElementById(‘foodFloats’);
-if (!container) return;
-const count = 18;
-for (let i = 0; i < count; i++) {
-const el = document.createElement(‘div’);
-el.className = ‘food-float’;
-el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-const left = Math.random() * 96;
-const dur  = 6 + Math.random() * 8;
-const delay = Math.random() * -14; // negative so they start mid-flight
-el.style.cssText = `left:${left}%;--dur:${dur}s;--delay:${delay}s`;
-container.appendChild(el);
-}
+  const emojis = ['🍕','🍣','🌮','🍜','🥐','🍔','🥗','🍷','🍦','🧁','🥩','🍱','🫕','🥘','🍝','🫔','🥨','🍤','🧆','🍙'];
+  const container = document.getElementById('foodFloats');
+  if (!container) return;
+  const count = 18;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'food-float';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    const left = Math.random() * 96;
+    const dur  = 6 + Math.random() * 8;
+    const delay = Math.random() * -14; // negative so they start mid-flight
+    el.style.cssText = `left:${left}%;--dur:${dur}s;--delay:${delay}s`;
+    container.appendChild(el);
+  }
 })();
 
 // ─── INIT ─────────────────────────────────────────────────────────
 const { username: savedUsername } = getProfile();
 if (!savedUsername) {
-document.getElementById(‘onboardView’).classList.add(‘active’);
+  document.getElementById('onboardView').classList.add('active');
 } else {
-showMainApp();
+  showMainApp();
 }
 </script>
 
@@ -2047,4 +2038,11 @@ window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
 });
 function installApp() {
-  if (defer
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+  }
+}
+</script>
+</body>
+</html>
