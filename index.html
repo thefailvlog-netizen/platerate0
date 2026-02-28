@@ -515,26 +515,21 @@
       <!-- Sign up panel -->
       <div id="ob_signup">
         <div class="onboard-field">
-          <label>Choose a Username *</label>
-          <input type="text" id="ob_username" placeholder="e.g. mike or foodie_sara"
-            oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')" />
-          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem">Lowercase, numbers, underscores only</div>
-        </div>
-        <div class="onboard-field">
-          <label>Your Display Name *</label>
-          <input type="text" id="ob_name" placeholder="e.g. Mike" autocomplete="given-name" />
+          <label>Your Name *</label>
+          <input type="text" id="ob_name" placeholder="e.g. Mike"
+            oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')" autocomplete="given-name" />
         </div>
         <button class="onboard-btn" id="ob_signup_btn" onclick="completeOnboarding()">Create My Journal →</button>
-        <p class="onboard-note">No password needed — your username is your key to your journal.<br>
-          Already have one? <a href="#" onclick="showPanel('ob_login');return false;" style="color:var(--accent)">Sign in →</a></p>
+        <p class="onboard-note">No password needed — your name is your key.<br>
+          Already have a journal? <a href="#" onclick="showPanel('ob_login');return false;" style="color:var(--accent)">Sign in →</a></p>
       </div>
 
       <!-- Sign in panel -->
       <div id="ob_login" style="display:none">
         <div class="onboard-field">
-          <label>Your Username *</label>
-          <input type="text" id="ob_login_user" placeholder="Enter your username"
-            oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')" />
+          <label>Your Name *</label>
+          <input type="text" id="ob_login_user" placeholder="Enter your name"
+            oninput="this.value=this.value.replace(/[^a-zA-Z0-9_ ]/g,'')" />
         </div>
         <button class="onboard-btn" id="ob_login_btn" onclick="loginWithUsername()">Open My Journal →</button>
         <p class="onboard-note"><a href="#" onclick="showPanel('ob_signup');return false;" style="color:var(--accent)">← Create a new journal</a></p>
@@ -859,32 +854,29 @@ function showPanel(id) {
 }
 
 function completeOnboarding() {
-  const username = document.getElementById('ob_username').value.trim();
-  const name     = document.getElementById('ob_name').value.trim();
-  if (!username || username.length < 2) { alert('Please choose a username (min 2 characters).'); return; }
-  if (!name) { alert('Please enter your display name.'); return; }
+  const name = document.getElementById('ob_name').value.trim();
+  if (!name || name.length < 2) { alert('Please enter your name (min 2 characters).'); return; }
+  const username = name.toLowerCase().replace(/\s+/g, '_');
   localStorage.setItem('profile_username', username);
   localStorage.setItem('profile_name', name);
   showMainApp();
 }
 
 function loginWithUsername() {
-  const username = document.getElementById('ob_login_user').value.trim();
-  if (!username) { alert('Please enter your username.'); return; }
+  const name = document.getElementById('ob_login_user').value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+  const username = name.toLowerCase().replace(/\s+/g, '_');
   localStorage.setItem('profile_username', username);
-  // Keep whatever display name they had, or use username as fallback
-  if (!localStorage.getItem('profile_name')) {
-    localStorage.setItem('profile_name', username);
-  }
+  localStorage.setItem('profile_name', name);
   showMainApp();
 }
 
 function switchUser() {
-  const target = prompt('Enter a username to switch to:');
-  if (!target) return;
-  const clean = target.toLowerCase().replace(/[^a-z0-9_]/g, '');
-  if (!clean) { alert('Invalid username.'); return; }
-  localStorage.setItem('profile_username', clean);
+  const name = prompt('Enter a name to switch to:');
+  if (!name || !name.trim()) return;
+  const clean = name.trim();
+  const username = clean.toLowerCase().replace(/\s+/g, '_');
+  localStorage.setItem('profile_username', username);
   localStorage.setItem('profile_name', clean);
   showMainApp();
 }
