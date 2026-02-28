@@ -309,7 +309,8 @@
   }
   .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
   .field textarea { resize: vertical; min-height: 80px; }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .row2 { display: grid; grid-template-columns: 1fr; gap: 0rem; }
+  @media (min-width: 420px) { .row2 { grid-template-columns: 1fr 1fr; gap: 0.75rem; } }
 
   /* Photo upload */
   .photo-upload-area {
@@ -338,13 +339,26 @@
   .slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); cursor: pointer; }
   .slider-val { width: 24px; text-align: right; font-size: 0.85rem; font-weight: 500; }
 
-  .tags-picker { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .tags-picker { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
   .tag-pick {
     padding: 0.3rem 0.85rem; border-radius: 2rem; border: 1px solid var(--border);
     font-size: 0.75rem; cursor: pointer; background: transparent;
     font-family: 'Jost', sans-serif; color: var(--ink); transition: all 0.15s;
   }
   .tag-pick.selected { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .custom-tag-row { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+  .custom-tag-input {
+    flex: 1; padding: 0.3rem 0.75rem; border: 1.5px solid var(--border);
+    border-radius: 2rem; font-family: 'Jost', sans-serif; font-size: 0.75rem;
+    background: white; color: var(--ink); outline: none; transition: border-color 0.2s;
+  }
+  .custom-tag-input:focus { border-color: var(--ink); }
+  .custom-tag-btn {
+    padding: 0.3rem 0.85rem; border-radius: 2rem; border: 1.5px solid var(--ink);
+    font-size: 0.75rem; cursor: pointer; background: transparent;
+    font-family: 'Jost', sans-serif; color: var(--ink); white-space: nowrap; transition: all 0.15s;
+  }
+  .custom-tag-btn:hover { background: var(--ink); color: var(--paper); }
 
   .submit-btn {
     width: 100%; padding: 1rem; background: var(--ink); color: var(--paper); border: none;
@@ -698,6 +712,11 @@
         <button class="tag-pick" onclick="toggleTag(this)">Business</button>
         <button class="tag-pick" onclick="toggleTag(this)">Date Night</button>
       </div>
+      <div class="custom-tag-row">
+        <input type="text" class="custom-tag-input" id="customTagInput" placeholder="Add your own tag…" maxlength="24"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTag();}" />
+        <button class="custom-tag-btn" onclick="addCustomTag()">+ Add</button>
+      </div>
     </div>
 
     <!-- Photo upload -->
@@ -733,11 +752,6 @@
       <div class="slider-row">
         <div class="slider-name">💰 Value</div>
         <input type="range" id="s_value" min="1" max="10" value="7" oninput="updateSlider(this)">
-        <div class="slider-val">7</div>
-      </div>
-      <div class="slider-row">
-        <div class="slider-name">🔇 Noise Level</div>
-        <input type="range" id="s_noise" min="1" max="10" value="7" oninput="updateSlider(this)">
         <div class="slider-val">7</div>
       </div>
     </div>
@@ -1013,16 +1027,30 @@ function startEditEntry() {
 
   // Sliders
   [['s_cuisine','score_cuisine'],['s_atmosphere','score_atmosphere'],['s_service','score_service'],
-   ['s_value','score_value'],['s_noise','score_noise']].forEach(([sid, key]) => {
+   ['s_value','score_value']].forEach(([sid, key]) => {
     const el = document.getElementById(sid);
     el.value = parseFloat(e[key]) || 7;
     el.nextElementSibling.textContent = el.value;
   });
 
-  // Tags
-  const entryTags = (e.tags || '').split(',').map(t => t.trim().toLowerCase());
-  document.querySelectorAll('.tag-pick').forEach(btn => {
-    btn.classList.toggle('selected', entryTags.includes(btn.textContent.trim().toLowerCase()));
+  // Tags — restore preset selections and re-create any custom tags
+  const entryTags = (e.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+  const defaultTags = ['Fine Dining','Casual','Brunch','Special Occasion','Business','Date Night'];
+  // Reset all presets first
+  document.querySelectorAll('#tagsPicker .tag-pick').forEach(btn => {
+    btn.classList.toggle('selected', entryTags.some(t => t.toLowerCase() === btn.textContent.trim().toLowerCase()));
+  });
+  // Remove any previously added custom tags
+  document.querySelectorAll('#tagsPicker .tag-pick.custom').forEach(b => b.remove());
+  // Add back custom tags from this entry
+  entryTags.forEach(t => {
+    if (!defaultTags.some(d => d.toLowerCase() === t.toLowerCase())) {
+      const btn = document.createElement('button');
+      btn.className = 'tag-pick selected custom';
+      btn.textContent = t;
+      btn.onclick = function() { toggleTag(this); };
+      document.getElementById('tagsPicker').appendChild(btn);
+    }
   });
 
   // Existing photos — load as already-uploaded cloudinary URLs
@@ -1039,10 +1067,11 @@ function resetForm() {
   document.getElementById('submitBtn').disabled         = false;
   document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
   document.getElementById('saveStatus').textContent = '';
-  ['s_cuisine','s_atmosphere','s_service','s_value','s_noise'].forEach(id => {
+  ['s_cuisine','s_atmosphere','s_service','s_value'].forEach(id => {
     const el = document.getElementById(id); el.value = 7; el.nextElementSibling.textContent = 7;
   });
   document.querySelectorAll('.tag-pick').forEach(t => t.classList.remove('selected'));
+  document.querySelectorAll('#tagsPicker .tag-pick.custom').forEach(b => b.remove());
   ['f_name','f_companions','f_notes','f_location'].forEach(id => document.getElementById(id).value = '');
   pendingPhotos = [];
   document.getElementById('photoPreviews').innerHTML = '';
@@ -1167,7 +1196,6 @@ function showEntryDetail(idx) {
     { name:'🌿 Atmosphere', key:'score_atmosphere' },
     { name:'🤝 Service',    key:'score_service'    },
     { name:'💰 Value',      key:'score_value'      },
-    { name:'🔇 Noise Level',key:'score_noise'      },
   ].map(a => {
     const val = parseFloat(e[a.key]) || 0;
     return `<div class="aspect-row">
@@ -1367,7 +1395,7 @@ async function saveEntry() {
 
 // ─── HELPERS ──────────────────────────────────────────────────────
 function calcOverall(e) {
-  const vals = ['score_cuisine','score_atmosphere','score_service','score_value','score_noise']
+  const vals = ['score_cuisine','score_atmosphere','score_service','score_value']
     .map(k => parseFloat(e[k])).filter(v => !isNaN(v));
   return vals.length ? (vals.reduce((a,b) => a+b,0) / vals.length).toFixed(1) : '—';
 }
@@ -1386,6 +1414,24 @@ function getColor(val) {
 }
 function updateSlider(el) { el.nextElementSibling.textContent = el.value; }
 function toggleTag(el)    { el.classList.toggle('selected'); }
+function addCustomTag() {
+  const input = document.getElementById('customTagInput');
+  const val = input.value.trim();
+  if (!val) return;
+  // Don't add duplicates
+  const existing = [...document.querySelectorAll('#tagsPicker .tag-pick')]
+    .map(t => t.textContent.toLowerCase());
+  if (existing.includes(val.toLowerCase())) {
+    input.value = '';
+    return;
+  }
+  const btn = document.createElement('button');
+  btn.className = 'tag-pick selected';
+  btn.textContent = val;
+  btn.onclick = function() { toggleTag(this); };
+  document.getElementById('tagsPicker').appendChild(btn);
+  input.value = '';
+}
 
 // ─── SWIPE GESTURES ───────────────────────────────────────────────
 (function() {
