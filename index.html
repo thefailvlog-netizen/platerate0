@@ -511,16 +511,32 @@
     <h1 class="onboard-title">Don't Order <em>Wrong</em> <span style="font-size:1rem;font-weight:300;color:var(--muted);font-style:normal;letter-spacing:1px">dot com</span></h1>
     <p class="onboard-sub">Your personal dining journal.<br>Rate restaurants, log memories, share your taste.</p>
     <div class="onboard-form">
-      <div class="onboard-field">
-        <label>Your First Name *</label>
-        <input type="text" id="ob_name" placeholder="e.g. Mike" autocomplete="given-name" />
+      <div id="ob_step1">
+        <div class="onboard-field">
+          <label>Choose a Username *</label>
+          <input type="text" id="ob_username" placeholder="e.g. mike, foodie_sara" autocomplete="username"
+            oninput="this.value = this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')"
+          />
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.4rem">Lowercase letters, numbers and underscores only</div>
+        </div>
+        <div class="onboard-field">
+          <label>Your Display Name *</label>
+          <input type="text" id="ob_name" placeholder="e.g. Mike" autocomplete="given-name" />
+        </div>
+        <button class="onboard-btn" onclick="completeOnboarding()">Create My Journal →</button>
+        <p class="onboard-note">No password needed — your username is your key. Already have one? <a href="#" onclick="showLoginScreen()" style="color:var(--accent)">Sign in →</a></p>
       </div>
-      <div class="onboard-field">
-        <label>Email Address *</label>
-        <input type="email" id="ob_email" placeholder="you@email.com" autocomplete="email" />
+
+      <div id="ob_step_login" style="display:none">
+        <div class="onboard-field">
+          <label>Your Username</label>
+          <input type="text" id="ob_login_username" placeholder="Enter your username"
+            oninput="this.value = this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')"
+          />
+        </div>
+        <button class="onboard-btn" onclick="loginWithUsername()">Open My Journal →</button>
+        <p class="onboard-note"><a href="#" onclick="showSignupScreen()" style="color:var(--accent)">← Create a new journal</a></p>
       </div>
-      <button class="onboard-btn" onclick="completeOnboarding()">Get Started →</button>
-      <p class="onboard-note">Your info is saved locally on your device. No password needed — just your name and email to personalise your journal.</p>
     </div>
   </div>
 </div>
@@ -729,7 +745,7 @@
   <div class="profile-hero">
     <div class="profile-avatar-wrap" id="profileAvatar">?</div>
     <div class="profile-name-display" id="profileNameDisplay">Your Name</div>
-    <div class="profile-email-display" id="profileEmailDisplay">your@email.com</div>
+    <div class="profile-email-display" id="profileEmailDisplay">@username</div>
   </div>
 
   <div class="profile-stats">
@@ -750,22 +766,23 @@
   <div class="profile-body">
     <div class="profile-section-title" style="margin-top:0">Edit Profile</div>
     <div class="profile-field">
-      <label>First Name</label>
+      <label>Display Name</label>
       <input type="text" id="p_name" placeholder="Your name" />
     </div>
     <div class="profile-field">
-      <label>Email Address</label>
-      <input type="email" id="p_email" placeholder="you@email.com" />
+      <label>Username</label>
+      <input type="text" id="p_username" placeholder="your_username" style="color:var(--muted)" readonly />
+      <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem">Username can't be changed — it's your journal's identity</div>
     </div>
     <button class="profile-save-btn" onclick="saveProfile()">Save Changes ✓</button>
 
-    <div class="profile-section-title">App Settings</div>
+    <div class="profile-section-title">Account</div>
     <div class="profile-menu">
-      <div class="menu-row" onclick="resetApiUrl()">
-        ⚙️ Change Database URL <span>SheetDB →</span>
+      <div class="menu-row" onclick="switchUser()">
+        🔀 Switch / Visit Another Journal <span>Change user →</span>
       </div>
-      <div class="menu-row" onclick="if(confirm('Clear all local data?')) { localStorage.clear(); location.reload(); }">
-        🗑️ Clear Local Data <span>Photos & settings</span>
+      <div class="menu-row" onclick="if(confirm('This will log you out and clear local data. Continue?')) { localStorage.clear(); location.reload(); }">
+        🚪 Log Out <span>Clear & restart</span>
       </div>
     </div>
   </div>
@@ -825,21 +842,91 @@ const TAG_CLASS = {
 let allEntries = [];
 let pendingPhotos = []; // base64 strings for new entry
 
-// ─── PROFILE / ONBOARDING ─────────────────────────────────────────
+// ─── PROFILE / ACCOUNTS ───────────────────────────────────────────
 function getProfile() {
   return {
-    name:  localStorage.getItem('profile_name')  || '',
-    email: localStorage.getItem('profile_email') || '',
+    username: localStorage.getItem('profile_username') || '',
+    name:     localStorage.getItem('profile_name')     || '',
   };
 }
 
-function completeOnboarding() {
-  const name  = document.getElementById('ob_name').value.trim();
-  const email = document.getElementById('ob_email').value.trim();
-  if (!name)  { alert('Please enter your first name.'); return; }
-  if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
-  localStorage.setItem('profile_name',  name);
-  localStorage.setItem('profile_email', email);
+function showSignupScreen() {
+  document.getElementById('ob_step1').style.display = 'block';
+  document.getElementById('ob_step_login').style.display = 'none';
+}
+
+function showLoginScreen() {
+  document.getElementById('ob_step1').style.display = 'none';
+  document.getElementById('ob_step_login').style.display = 'block';
+}
+
+async function completeOnboarding() {
+  const username = document.getElementById('ob_username').value.trim();
+  const name     = document.getElementById('ob_name').value.trim();
+  if (!username) { alert('Please choose a username.'); return; }
+  if (username.length < 2) { alert('Username must be at least 2 characters.'); return; }
+  if (!name) { alert('Please enter your display name.'); return; }
+
+  // Check if username already exists in the sheet
+  const btn = document.querySelector('#ob_step1 .onboard-btn');
+  btn.textContent = 'Checking…'; btn.disabled = true;
+  try {
+    const res = await fetch(`${API_URL}?search[username]=${encodeURIComponent(username)}&limit=1`);
+    const data = await res.json();
+    if (data.length > 0) {
+      btn.textContent = 'Create My Journal →'; btn.disabled = false;
+      alert(`The username "${username}" is already taken! Try another.`);
+      return;
+    }
+  } catch {
+    // Can't check — allow anyway
+  }
+  btn.textContent = 'Create My Journal →'; btn.disabled = false;
+
+  localStorage.setItem('profile_username', username);
+  localStorage.setItem('profile_name', name);
+  showMainApp();
+}
+
+async function loginWithUsername() {
+  const username = document.getElementById('ob_login_username').value.trim();
+  if (!username) { alert('Please enter your username.'); return; }
+
+  const btn = document.querySelector('#ob_step_login .onboard-btn');
+  btn.textContent = 'Looking up…'; btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_URL}?search[username]=${encodeURIComponent(username)}&limit=1`);
+    const data = await res.json();
+    if (data.length === 0) {
+      btn.textContent = 'Open My Journal →'; btn.disabled = false;
+      alert(`No journal found for "${username}". Check your username or create a new one.`);
+      return;
+    }
+    // Found — log them in using saved display name if we have it
+    const displayName = data[0].display_name || username;
+    localStorage.setItem('profile_username', username);
+    localStorage.setItem('profile_name', displayName);
+    btn.textContent = 'Open My Journal →'; btn.disabled = false;
+    showMainApp();
+  } catch {
+    btn.textContent = 'Open My Journal →'; btn.disabled = false;
+    // Allow login anyway — let them in even if check fails
+    localStorage.setItem('profile_username', username);
+    localStorage.setItem('profile_name', username);
+    showMainApp();
+  }
+}
+
+function switchUser() {
+  const target = prompt('Enter a username to switch to (or your own to stay):');
+  if (!target) return;
+  const clean = target.toLowerCase().replace(/[^a-z0-9_]/g, '');
+  if (!clean) { alert('Invalid username.'); return; }
+  localStorage.setItem('profile_username', clean);
+  // Keep display name if same user, otherwise use username as temp name
+  const current = getProfile();
+  if (current.username !== clean) localStorage.setItem('profile_name', clean);
   showMainApp();
 }
 
@@ -849,58 +936,60 @@ function showMainApp() {
 }
 
 function updateJournalTitle() {
-  const { name } = getProfile();
+  const { name, username } = getProfile();
   const titleEl = document.getElementById('journalTitle');
-  if (titleEl) titleEl.textContent = name ? `${name}'s Dining Journal` : "Don't Order Wrong";
+  if (!titleEl) return;
+  const display = name || username;
+  titleEl.textContent = display ? `${display}'s Journal` : "Don't Order Wrong";
 }
 
 function saveProfile() {
-  const name  = document.getElementById('p_name').value.trim();
-  const email = document.getElementById('p_email').value.trim();
-  if (!name)  { alert('Please enter your name.'); return; }
-  if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
-  localStorage.setItem('profile_name',  name);
-  localStorage.setItem('profile_email', email);
+  const name = document.getElementById('p_name').value.trim();
+  if (!name) { alert('Please enter your display name.'); return; }
+  localStorage.setItem('profile_name', name);
   refreshProfileView();
   updateJournalTitle();
   alert('✓ Profile saved!');
 }
 
 function refreshProfileView() {
-  const { name, email } = getProfile();
-  document.getElementById('profileAvatar').textContent       = name ? name[0].toUpperCase() : '?';
-  document.getElementById('profileNameDisplay').textContent  = name  || 'Your Name';
-  document.getElementById('profileEmailDisplay').textContent = email || 'your@email.com';
-  document.getElementById('p_name').value  = name;
-  document.getElementById('p_email').value = email;
+  const { name, username } = getProfile();
+  document.getElementById('profileAvatar').textContent      = (name||username||'?')[0].toUpperCase();
+  document.getElementById('profileNameDisplay').textContent = name || username || 'Your Name';
+  document.getElementById('profileEmailDisplay').textContent = username ? `@${username}` : '@username';
+  document.getElementById('p_name').value     = name;
+  document.getElementById('p_username').value = username;
 
-  // Stats from loaded entries
   const visits = allEntries.length;
   document.getElementById('statVisits').textContent = visits;
   if (visits > 0) {
     const scores = allEntries.map(e => parseFloat(calcOverall(e))).filter(v => !isNaN(v));
-    const avg = scores.length ? (scores.reduce((a,b) => a+b,0)/scores.length).toFixed(1) : '—';
+    const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—';
     document.getElementById('statAvg').textContent = avg;
-    // Top cuisine
     const cuisineCount = {};
     allEntries.forEach(e => { if (e.cuisine) cuisineCount[e.cuisine] = (cuisineCount[e.cuisine]||0)+1; });
-    const top = Object.entries(cuisineCount).sort((a,b) => b[1]-a[1])[0];
+    const top = Object.entries(cuisineCount).sort((a,b)=>b[1]-a[1])[0];
     document.getElementById('statTop').textContent = top ? top[0].slice(0,3) : '—';
   }
 }
-
-function resetApiUrl() {
-  const url = prompt('Enter new SheetDB URL:', API_URL);
-  // Since URL is hardcoded, just inform user
-  alert('The database URL is set in the app code. Ask your developer to update it!');
-}
-
-function switchTab(viewId, btn) {
   // Update all bottom nav tabs
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.bottom-nav .nav-tab').forEach(t => {
     if (t.textContent.includes(btn.textContent.trim().split('\n').pop().trim())) t.classList.add('active');
   });
+  btn.classList.add('active');
+  if (viewId === 'profileView') {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('profileView').classList.add('active');
+    window.scrollTo(0,0);
+    refreshProfileView();
+  } else {
+    showView(viewId);
+  }
+}
+
+function switchTab(viewId, btn) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   if (viewId === 'profileView') {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -939,11 +1028,15 @@ function resetForm() {
 // ─── LOAD ─────────────────────────────────────────────────────────
 async function loadEntries() {
   const list = document.getElementById('entriesList');
-  list.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading your journal…</p></div>`;
+  const { username } = getProfile();
+  list.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading ${username ? '@'+username+"'s" : 'your'} journal…</p></div>`;
   try {
-    const res = await fetch(`${API_URL}?limit=100`);
+    // Fetch all entries then filter by username client-side (SheetDB free tier doesn't support search+limit well)
+    const res = await fetch(`${API_URL}?limit=500`);
     if (!res.ok) throw new Error();
-    allEntries = (await res.json()).reverse();
+    const all = await res.json();
+    // Filter to current user's entries only
+    allEntries = all.filter(e => e.username === username).reverse();
     renderEntries(allEntries);
   } catch {
     list.innerHTML = `<div class="error-state"><p>⚠️ Couldn't load entries. Check your connection.</p></div>`;
@@ -1203,8 +1296,11 @@ async function saveEntry() {
     .map(p => p.cloudUrl)
     .join(',');
 
+  const { username, name: displayName } = getProfile();
   const tags = [...document.querySelectorAll('.tag-pick.selected')].map(t => t.textContent).join(', ');
   const row = {
+    username,
+    display_name: displayName,
     name, date,
     cuisine:          document.getElementById('f_cuisine').value,
     location:         document.getElementById('f_location').value.trim(),
@@ -1258,9 +1354,8 @@ function updateSlider(el) { el.nextElementSibling.textContent = el.value; }
 function toggleTag(el)    { el.classList.toggle('selected'); }
 
 // ─── INIT ─────────────────────────────────────────────────────────
-const { name: savedName } = getProfile();
-if (!savedName) {
-  // First time — show onboarding
+const { username: savedUsername } = getProfile();
+if (!savedUsername) {
   document.getElementById('onboardView').classList.add('active');
 } else {
   showMainApp();
