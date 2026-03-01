@@ -1736,18 +1736,7 @@ if (Math.abs(dx) > 50) carouselStep(dx < 0 ? 1 : -1);
 };
 }
 
-// Close on backdrop click (but not on image/arrows)
-document.getElementById(‘lightbox’).addEventListener(‘click’, function(e) {
-if (e.target === this) closeLightbox();
-});
-
-// Keyboard navigation
-document.addEventListener(‘keydown’, e => {
-if (!document.getElementById(‘lightbox’).classList.contains(‘open’)) return;
-if (e.key === ‘ArrowRight’) carouselStep(1);
-if (e.key === ‘ArrowLeft’)  carouselStep(-1);
-if (e.key === ‘Escape’)     closeLightbox();
-});
+// Close on backdrop click handled in DOMContentLoaded below
 
 // ─── DELETE ───────────────────────────────────────────────────────
 async function deleteEntry() {
@@ -2060,30 +2049,49 @@ closeInstallModal();
 }
 
 // ─── FLOATING FOOD EMOJIS ─────────────────────────────────────────
+// ─── INIT ─────────────────────────────────────────────────────────
+window.addEventListener(‘DOMContentLoaded’, function() {
+
+// Floating food emojis
 (function() {
 const emojis = [‘🍕’,‘🍣’,‘🌮’,‘🍜’,‘🥐’,‘🍔’,‘🥗’,‘🍷’,‘🍦’,‘🧁’,‘🥩’,‘🍱’,‘🫕’,‘🥘’,‘🍝’,‘🫔’,‘🥨’,‘🍤’,‘🧆’,‘🍙’];
 const container = document.getElementById(‘foodFloats’);
 if (!container) return;
-const count = 18;
-for (let i = 0; i < count; i++) {
+for (let i = 0; i < 18; i++) {
 const el = document.createElement(‘div’);
 el.className = ‘food-float’;
 el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 const left = Math.random() * 96;
 const dur  = 6 + Math.random() * 8;
-const delay = Math.random() * -14; // negative so they start mid-flight
+const delay = Math.random() * -14;
 el.style.cssText = `left:${left}%;--dur:${dur}s;--delay:${delay}s`;
 container.appendChild(el);
 }
 })();
 
-// ─── INIT ─────────────────────────────────────────────────────────
+// Lightbox backdrop click
+const lb = document.getElementById(‘lightbox’);
+if (lb) lb.addEventListener(‘click’, function(e) {
+if (e.target === this) closeLightbox();
+});
+
+// Keyboard navigation for carousel
+document.addEventListener(‘keydown’, e => {
+if (!document.getElementById(‘lightbox’).classList.contains(‘open’)) return;
+if (e.key === ‘ArrowRight’) carouselStep(1);
+if (e.key === ‘ArrowLeft’)  carouselStep(-1);
+if (e.key === ‘Escape’)     closeLightbox();
+});
+
+// App init
 const { username: savedUsername } = getProfile();
 if (!savedUsername) {
 document.getElementById(‘onboardView’).classList.add(‘active’);
 } else {
 showMainApp();
 }
+
+});
 </script>
 
 <script>
